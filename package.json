@@ -1,0 +1,27 @@
+{
+  "name": "Blocipedia",
+  "version": "1.0.0",
+  "description": "An app that lets users create wikis and share them publicly or privately with other collaborators.",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "export NODE_ENV=test && jasmine",
+    "start": "node src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/finnwhite/bloc.io_wdt_blocipedia-node.git"
+  },
+  "author": "Finn White",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/finnwhite/bloc.io_wdt_blocipedia-node/issues"
+  },
+  "homepage": "https://github.com/finnwhite/bloc.io_wdt_blocipedia-node#readme",
+  "devDependencies": {
+    "jasmine": "^3.3.1",
+    "request": "^2.88.0"
+  },
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
