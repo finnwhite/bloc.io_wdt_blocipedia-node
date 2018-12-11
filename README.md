@@ -2,6 +2,14 @@
 Bloc > WDT > M04-S04 Blocipedia
 
 
+## Blocipedia
+
+An app that lets users create wikis and share them publicly or privately with other collaborators.
+
+**On Heroku:** [finnwhite-blocipedia](https://finnwhite--bloc--blocipedia.herokuapp.com/)
+
+---
+
 ### Wireframes
 
 ---
