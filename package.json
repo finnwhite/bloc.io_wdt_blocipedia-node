@@ -8,12 +8,13 @@
     "start": "node src/server.js",
     "pg-info": "pgc info pg96",
     "pg-restart": "pgc restart pg96",
-    "sq-migrate": "sequelize db:migrate && sequelize db:migrate --env test",
+    "sq-mg": "sequelize db:migrate && sequelize db:migrate --env test",
+    "sq-mginfo": "sequelize db:migrate:status && sequelize db:migrate:status --env test",
     "sq-mgundo": "sequelize db:migrate:undo:all && sequelize db:migrate:undo:all --env test",
-    "sq-mgreset": "npm run sq-mgundo && npm run sq-migrate",
-    "sq-seed": "sequelize db:seed:all",
+    "sq-mgredo": "npm run sq-mgundo && npm run sq-migrate",
+    "sq-sd": "sequelize db:seed:all",
     "sq-sdundo": "sequelize db:seed:undo:all",
-    "sq-sdreset": "npm run sq-sdundo && npm run sq-seed"
+    "sq-sdredo": "npm run sq-sdundo && npm run sq-seed"
   },
   "repository": {
     "type": "git",
@@ -35,6 +36,9 @@
     "dotenv": "^6.2.0",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
+    "express-flash": "0.0.2",
+    "express-session": "^1.15.6",
+    "express-validator": "^5.3.0",
     "pg": "^7.7.1",
     "pg-hstore": "^2.3.2",
     "sequelize": "^4.41.2",
