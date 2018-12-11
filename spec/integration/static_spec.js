@@ -8,14 +8,15 @@ describe( "routes:static:", () => {
 
   describe( "GET '/'", () => {
 
-    it( "should return status code 200", ( done ) => {
+    it( "should return status code 200 AND" +
+        "contain the title 'Welcome to Blocipedia!'", ( done ) => {
 
       const url = `${ base }/`;
 
       request.get( url, ( err, res, body ) => {
         expect( err ).toBeNull();
         expect( res.statusCode ).toBe( 200 );
-        expect( body ).toContain( "Blocipedia" );
+        expect( body ).toContain( "<title>Welcome to Blocipedia!</title>" );
         done();
       } );
     } );
