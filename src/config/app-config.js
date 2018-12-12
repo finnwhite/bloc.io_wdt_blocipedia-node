@@ -4,6 +4,8 @@ const parser = require( "body-parser" );
 const validator = require( "express-validator" );
 const session = require( "express-session" );
 const flash = require( "express-flash" );
+const passport = require( "./passport-config.js" );
+const auth = require( "../util/authentication.js" );
 
 module.exports = {
 
@@ -11,6 +13,7 @@ module.exports = {
 
     app.set( "views", path.join( __dirname, "..", "views" ) );
     app.set( "view engine", "ejs" );
+    app.use( express.static( path.join( __dirname, "..", "assets" ) ) );
 
     app.use( parser.urlencoded( { extended: true } ) );
 
@@ -25,8 +28,8 @@ module.exports = {
 
     app.use( flash() );
 
-    app.use( express.static( path.join( __dirname, "..", "assets" ) ) );
-
+    passport.init( app );
+    app.use( auth.storeUser );
   },
 
 };

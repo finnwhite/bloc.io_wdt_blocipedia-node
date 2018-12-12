@@ -1,10 +1,14 @@
-<% if ( messages.alert ) { %>
-
-  <div class="alert alert-warning alert-dismissible fade show" role="alert">
-    <p>Status message.</p>
+<% if ( messages.alert ) {
+  const style = messages.style;
+  const alertStyle = style ? `alert-${ style }` : "alert-info"; %>
+  <div class="alert <%= alertStyle %> alert-dismissible fade show" role="alert">
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
+    <ul>
+      <% messages.alert.forEach( ( alert ) => { %>
+        <li><%= alert %></li>
+      <% } ); %>
+    </ul>
   </div>
-
 <% } %>

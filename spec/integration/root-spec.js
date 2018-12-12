@@ -23,12 +23,12 @@ describe( "routes:root:", () => {
 
   } );
 
-  describe( "POST '/validation'", () => {
+  describe( "POST '/validate'", () => {
 
     it( "should pass validation when sent valid values", ( done ) => {
 
-      const url = `${ base }/validation`;
-      const form = { email: "admin@example.com", password: "1234567890" };
+      const url = `${ base }/validate`;
+      const form = { username: "test@example.com", password: "123456" };
       const options = { url, form };
 
       request.post( options, ( err, res, body ) => {
@@ -40,8 +40,8 @@ describe( "routes:root:", () => {
 
     it( "should NOT pass validation when sent INVALID values", ( done ) => {
 
-      const url = `${ base }/validation`;
-      const form = { email: "admin@example", password: "1234" };
+      const url = `${ base }/validate`;
+      const form = { username: "test@example", password: "1234" };
       const options = { url, form };
 
       request.post( options, ( err, res, body ) => {

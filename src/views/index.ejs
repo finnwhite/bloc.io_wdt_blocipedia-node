@@ -10,7 +10,40 @@
     <main class="container">
       <%- include( "./includes/messages.ejs" ); -%>
 
-      <h1>Heading</h1>
+      <header class="jumbotron my-4 text-center">
+        <h1 class="display-4">Blocipedia: Social, Markdown Wikis</h1>
+        <p class="lead">Create and share Markdown Wikis</p>
+        <a class="btn btn-primary btn-lg" href="/sign-up" role="button">Sign Up</a>
+      </header>
+
+      <div class="row">
+        <div class="col">
+          <div class="card text-center">
+            <h5 class="card-header">Standard Plan</h5>
+            <div class="card-body">
+              <ul class="list-unstyled">
+                <li>Unlimited Public Wikis</li>
+                <li>Unlimited Collaborators</li>
+                <li>( FREE )</li>
+              </ul>
+              <a href="#" class="btn btn-secondary">Try Standard</a>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card text-center">
+            <h5 class="card-header">Premium Plan</h5>
+            <div class="card-body">
+              <ul class="list-unstyled">
+                <li>All Standard Plan features</li>
+                <li>Unlimited Public Wikis</li>
+                <li>( $4.99/month )</li>
+              </ul>
+              <a href="#" class="btn btn-secondary">Try Premium</a>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </main>
     <%- include( "./includes/body-end.ejs" ); -%>
