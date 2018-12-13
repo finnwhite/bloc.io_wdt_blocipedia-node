@@ -30,6 +30,10 @@ module.exports = {
 
     passport.init( app );
     app.use( auth.storeUser );
+
+    if ( process.env.NODE_ENV === "test" ) {
+      require( "../../spec/support/test-config.js" ).init( app );
+    }
   },
 
 };
