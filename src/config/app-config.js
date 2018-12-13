@@ -6,6 +6,7 @@ const session = require( "express-session" );
 const flash = require( "express-flash" );
 const passport = require( "./passport-config.js" );
 const auth = require( "../util/authentication.js" );
+const logger = require( "morgan" );
 
 module.exports = {
 
@@ -30,6 +31,8 @@ module.exports = {
 
     passport.init( app );
     app.use( auth.storeUser );
+
+    app.use( logger( "dev" ) );
 
     if ( process.env.NODE_ENV === "test" ) {
       require( "../../spec/support/test-config.js" ).init( app );
