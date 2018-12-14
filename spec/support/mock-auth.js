@@ -1,6 +1,6 @@
 const request = require( "request" );
 const base = "http://localhost:3000";
-const path = "/auth/mock";
+const path = "/mock/auth";
 const url = base + path;
 
 module.exports = {

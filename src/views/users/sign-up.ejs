@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include( "../includes/head-start.ejs",
+      { docTitle: "Blocipedia | Sign Up" }
+    ); -%>
+  </head>
+  <body>
+    <%- include( "../includes/navbar.ejs" ); -%>
+    <main class="container">
+      <%- include( "../includes/messages.ejs" ); -%>
+
+      <h1>Sign Up</h1>
+
+      <form method="POST" action="/users/create">
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" class="form-control" id="username" name="username" placeholder="Choose username" aria-label="username" aria-describedby="usernameHelp">
+          <small id="usernameHelp" class="form-text text-muted">Username must be at least 2 characters in length.</small>
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email">
+          <small id="emailHelp" class="form-text text-muted">Email must be a valid email address.</small>
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" class="form-control" id="password" name="password" aria-describedby="passwordHelp" placeholder="Choose password">
+          <small id="passwordHelp" class="form-text text-muted">Password must be at least 4 characters in length.</small>
+        </div>
+        <div class="form-group">
+          <label for="confirmation">Confirm Password:</label>
+          <input type="password" class="form-control" id="confirmation" name="confirmation" aria-describedby="confirmationHelp" placeholder="Confirm password">
+          <small id="confirmationHelp" class="form-text text-muted">Confirmation and password must match.</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Sign Up</button>
+      </form>
+
+    </main>
+    <%- include( "../includes/body-end.ejs" ); -%>
+  </body>
+</html>

@@ -11,7 +11,7 @@
     "sq-mg": "sequelize db:migrate && sequelize db:migrate --env test",
     "sq-mginfo": "sequelize db:migrate:status && sequelize db:migrate:status --env test",
     "sq-mgundo": "sequelize db:migrate:undo:all && sequelize db:migrate:undo:all --env test",
-    "sq-mgredo": "npm run sq-mgundo && npm run sq-migrate",
+    "sq-mgredo": "npm run sq-mgundo && npm run sq-mg",
     "sq-sd": "sequelize db:seed:all",
     "sq-sdundo": "sequelize db:seed:undo:all",
     "sq-sdredo": "npm run sq-sdundo && npm run sq-seed"

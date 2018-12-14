@@ -1,5 +1,6 @@
 const passport = require( "passport" );
 const LocalStrategy = require( "passport-local" ).Strategy;
+const User = require( "../db/models" ).User;
 const auth = require( "../util/authentication.js" );
 
 module.exports = {
@@ -11,9 +12,6 @@ module.exports = {
 
     passport.use( new LocalStrategy(
       ( username, password, done ) => {
-
-        return done( null, { id: 1 } );
-        /*
         User.findOne( { where: { username } } )
         .then( ( user ) => {
           if ( !user || !auth.match( password, user.password ) ) {
@@ -24,7 +22,6 @@ module.exports = {
           return done( null, user );
         } )
         .catch( ( err ) => { return done( err ); } );
-        */
       }
     ) );
 
@@ -33,12 +30,9 @@ module.exports = {
     } );
 
     passport.deserializeUser( ( id, done ) => {
-      done( null, { id: 1 } );
-      /*
       User.findByPk( id )
       .then( ( user ) => { done( null, user ); } )
       .catch( ( err ) => { done( err ); } );
-      */
     } );
   },
 

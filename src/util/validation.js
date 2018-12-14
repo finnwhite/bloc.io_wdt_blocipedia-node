@@ -13,14 +13,22 @@ module.exports = {
     next();
   },
 
-  validate: [
+  createUser: [
     check( "username" )
+    .isLength( { min: 2 } )
+    .withMessage( "must be at least 2 characters in length" ),
+
+    check( "email" )
     .isEmail()
     .withMessage( "must be a valid email address" ),
 
     check( "password" )
-    .isLength( { min: 6 } )
-    .withMessage( "must be at least 6 characters in length" )
+    .isLength( { min: 4 } )
+    .withMessage( "must be at least 4 characters in length" ),
+
+    check( "confirmation" )
+    .custom( ( value, { req } ) => { return ( value === req.body.password ) } )
+    .withMessage( "and password must match" ),
   ],
 
 };

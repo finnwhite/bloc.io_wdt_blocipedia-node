@@ -18,7 +18,7 @@ module.exports = {
 
     app.use( parser.urlencoded( { extended: true } ) );
 
-    app.use( validator() ); // Legacy API setup
+    app.use( validator() );
 
     app.use( session( {
       secret: ( process.env.cookiesecret || "BL0C1p3d1a 53CR3T!" ),

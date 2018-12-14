@@ -7,15 +7,14 @@ describe( "routes:root", () => {
 
   describe( "GET /", () => {
 
-    it( "should return status code 200 AND" +
-        "contain the title 'Welcome to Blocipedia!'", ( done ) => {
+    it( "should render the Home page", ( done ) => {
 
       const url = `${ base }/`;
 
       request.get( url, ( err, res, body ) => {
         expect( err ).toBeNull();
         expect( res.statusCode ).toBe( 200 );
-        expect( body ).toContain( "<title>Welcome to Blocipedia!</title>" );
+        expect( body ).toContain( "Welcome to Blocipedia!" );
         done();
       } );
     } );

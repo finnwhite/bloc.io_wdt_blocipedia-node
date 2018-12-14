@@ -20,7 +20,7 @@ module.exports = {
     if ( !req.user ) {
       req.flash( "style", "warning" );
       req.flash( "alert", "You must be signed in to do that." );
-      return res.redirect( ( req.headers.referer || "/sign-in" ) );
+      return res.redirect( ( req.headers.referer || "/users/sign-in" ) );
     }
     next();
   },
@@ -31,7 +31,7 @@ module.exports = {
       if ( !user ) {
         req.flash( "style", "danger" );
         req.flash( "alert", info.message );
-        return res.redirect( ( req.headers.referer || "/sign-in" ) );
+        return res.redirect( ( req.headers.referer || "/users/sign-in" ) );
       }
       req.logIn( user, ( err ) => {
         if ( err ) { return next( err ); }
