@@ -6,7 +6,7 @@ app.set( "port", port );
 
 const server = http.createServer( app );
 server.listen( port, () => {
-  console.log( `server listening on port ${ server.address().port }` );
+  console.log( "server listening on port %O", server.address().port );
 } );
 
 function normalizePort( value ) {

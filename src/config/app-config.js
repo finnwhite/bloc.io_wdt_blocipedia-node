@@ -1,4 +1,6 @@
 require( "dotenv" ).config();
+require( "./env-config.js" ).init();
+
 const path = require( "path" );
 const parser = require( "body-parser" );
 const validator = require( "express-validator" );
@@ -21,7 +23,7 @@ module.exports = {
     app.use( validator() );
 
     app.use( session( {
-      secret: ( process.env.cookiesecret || "BL0C1p3d1a 53CR3T!" ),
+      secret: ( process.env.COOKIE_SECRET || "BL0C1p3d1a 53CR3T!" ),
       resave: false,
       saveUninitialized: false,
       cookie: { maxAge: 1.21e+9 } // 14 days

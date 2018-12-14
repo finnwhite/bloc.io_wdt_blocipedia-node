@@ -8,10 +8,14 @@
     "start": "node src/server.js",
     "pg-info": "pgc info pg96",
     "pg-restart": "pgc restart pg96",
-    "sq-mg": "sequelize db:migrate && sequelize db:migrate --env test",
-    "sq-mginfo": "sequelize db:migrate:status && sequelize db:migrate:status --env test",
-    "sq-mgundo": "sequelize db:migrate:undo:all && sequelize db:migrate:undo:all --env test",
+    "sq-mg": "sequelize db:migrate",
+    "sq-mginfo": "sequelize db:migrate:status",
+    "sq-mgundo": "sequelize db:migrate:undo:all",
     "sq-mgredo": "npm run sq-mgundo && npm run sq-mg",
+    "sq-mg*": "npm run sq-mg && sequelize db:migrate --env test",
+    "sq-mginfo*": "npm run sq-mginfo && sequelize db:migrate:status --env test",
+    "sq-mgundo*": "npm run sq-mgundo && sequelize db:migrate:undo:all --env test",
+    "sq-mgredo*": "npm run sq-mgundo* && npm run sq-mg*",
     "sq-sd": "sequelize db:seed:all",
     "sq-sdundo": "sequelize db:seed:undo:all",
     "sq-sdredo": "npm run sq-sdundo && npm run sq-seed"
@@ -32,6 +36,7 @@
     "request": "^2.88.0"
   },
   "dependencies": {
+    "@sendgrid/mail": "^6.3.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "dotenv": "^6.2.0",
@@ -45,7 +50,7 @@
     "passport-local": "^1.0.0",
     "pg": "^7.7.1",
     "pg-hstore": "^2.3.2",
-    "sequelize": "^4.41.2",
+    "sequelize": "^4.42.0",
     "sequelize-cli": "^5.4.0"
   }
 }

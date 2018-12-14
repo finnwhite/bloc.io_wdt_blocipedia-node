@@ -1,6 +1,7 @@
 const UserQueries = require( "../db/queries/UserQueries.js" );
 const queries = new UserQueries();
 const auth = require( "../util/authentication.js" );
+const email = require( "../util/email.js" );
 
 module.exports = {
 
@@ -20,7 +21,11 @@ module.exports = {
         req.flash( "alert", err );
         res.redirect( ( req.headers.referer || "/users/sign-up" ) );
       }
-      else { auth.signIn( req, res, next ); }
+      else {
+        const to = `${ user.username } <${ user.email }>`;
+        email.service.send( email.messages.welcome( to ), email.logResult() );
+        auth.signIn( req, res, next );
+      }
     } );
   },
 
