@@ -1,14 +1,10 @@
 const email = require( "@sendgrid/mail" );
 email.setApiKey( process.env.SENDGRID_API_KEY );
 
-const dummy = {
-  send( ...args ) {
-    console.log( "email.send(): %O", args.length );
-  },
-  sendMultiple( ...args ) {
-    console.log( "email.sendMultiple(): %O", args.length );
-  },
-}
+/* dummy service to supress sending email during testing */
+function send( msg ) { console.log( "email.send(): %O", msg.to ); }
+const dummy = { send }
+
 const service = ( process.env.NODE_ENV === "test" ) ? dummy : email;
 
 module.exports = {

@@ -1,7 +1,6 @@
 const passport = require( "passport" );
 const LocalStrategy = require( "passport-local" ).Strategy;
 const User = require( "../db/models" ).User;
-const auth = require( "../util/authentication.js" );
 
 module.exports = {
 
@@ -14,7 +13,7 @@ module.exports = {
       ( username, password, done ) => {
         User.findOne( { where: { username } } )
         .then( ( user ) => {
-          if ( !user || !auth.match( password, user.password ) ) {
+          if ( !user || !user.matchPassword( password ) ) {
             return done( null, false,
               { message: "Invalid username or password" }
             );

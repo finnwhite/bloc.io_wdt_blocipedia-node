@@ -31,4 +31,14 @@ module.exports = {
     .withMessage( "and password must match" ),
   ],
 
+  signIn: [
+    check( "username" )
+    .not().isEmpty()
+    .withMessage( "must not be empty" ),
+
+    check( "password" )
+    .not().isEmpty()
+    .withMessage( "must not be empty" ),
+  ],
+
 };

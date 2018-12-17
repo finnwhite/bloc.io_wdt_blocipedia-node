@@ -4,15 +4,13 @@ const base = "http://localhost:3000/users";
 
 const sequelize = require( "../../src/db/models" ).sequelize;
 const User = require( "../../src/db/models" ).User;
-
-const auth = require( "../../src/util/authentication.js" );
-const mockAuth = require( "../support/mock-auth.js" );
+const auth = require( "../support/mock-auth.js" );
 
 
 describe( "routes:users", () => {
 
   beforeAll( ( done ) => {
-    mockAuth.signOut( done );
+    auth.signOut( done );
   } );
   beforeEach( ( done ) => {
     sequelize.sync( { force: true } )
@@ -23,7 +21,7 @@ describe( "routes:users", () => {
     } );
   } );
   afterEach( ( done ) => {
-    mockAuth.signOut( done );
+    auth.signOut( done );
   } );
 
   describe( ":guest", () => {
@@ -37,7 +35,7 @@ describe( "routes:users", () => {
         request.get( url, ( err, res, body ) => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 200 );
-          expect( body ).toContain( "Sign Up" );
+          expect( body ).toContain( "Blocipedia | Sign Up" );
           done();
         } );
       } );
@@ -53,8 +51,8 @@ describe( "routes:users", () => {
         const form = {
           username: "valid",
           email: "valid@example.com",
-          password: "123456",
-          confirmation: "123456",
+          password: "1234567890",
+          confirmation: "1234567890",
         };
         const options = { url, form };
 
@@ -66,15 +64,11 @@ describe( "routes:users", () => {
           .then( ( user ) => {
             expect( user ).not.toBeNull();
 
-            const match = auth.match( form.password, user.password );
+            const encrypted = user.matchPassword( form.password );
 
-            expect( user.username ).toBe( form.username ); // "testuser"
-            expect( user.password ).not.toBe( form.password ); // "123456"
-            expect( match ).toBeTruthy(); // password ENCRYPTED!
-            done();
-          } )
-          .catch( ( err ) => {
-            console.log( err );
+            expect( user.username ).toBe( form.username ); // "valid"
+            expect( user.password ).not.toBe( form.password ); // "1234567890"
+            expect( encrypted ).toBeTruthy(); // password ENCRYPTED!
             done();
           } );
         } );
@@ -98,10 +92,6 @@ describe( "routes:users", () => {
           .then( ( user ) => {
             expect( user ).toBeNull();
             done();
-          } )
-          .catch( ( err ) => {
-            console.log( err );
-            done();
           } );
         } );
       } );
@@ -111,6 +101,44 @@ describe( "routes:users", () => {
 
   } );
   /* END: routes:users:guest ----- */
+
+  describe( ":standard", () => {
+
+    beforeEach( ( done ) => {
+
+      const values = {
+        username: "valid",
+        email: "valid@example.com",
+        password: "1234567890",
+        role: "standard",
+      };
+
+      User.create( values )
+      .then( ( user ) => {
+        expect( user.role ).toBe( "standard" );
+        done();
+      } );
+    } );
+
+    describe( "GET /users/sign-in", () => {
+
+      it( "should render the Sign In page", ( done ) => {
+
+        const url = `${ base }/sign-in`;
+
+        request.get( url, ( err, res, body ) => {
+          expect( err ).toBeNull();
+          expect( res.statusCode ).toBe( 200 );
+          expect( body ).toContain( "Blocipedia | Sign In" );
+          done();
+        } );
+      } );
+
+    } );
+    /* END: GET /users/sign-in ----- */
+
+  } );
+  /* END: routes:users:standard ----- */
 
 } );
 /* END: routes:users ----- */

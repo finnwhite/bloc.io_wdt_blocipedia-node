@@ -1,6 +1,11 @@
 'use strict';
-module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('User', {
+
+const UserQueries = require( "../queries/UserQueries.js" );
+const crypt = require( "../../util/encryption.js" );
+
+module.exports = ( sequelize, DataTypes ) => {
+
+  const User = sequelize.define( "User", {
     username: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -23,9 +28,25 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: "guest",
     },
-  }, {});
-  User.associate = function(models) {
+  }, {} );
+
+  User.associate = function( models ) {
     // associations can be defined here
   };
+
+  User.queries = new UserQueries( User );
+
+  User.encryptPassword = function( password ) {
+    return crypt.encrypt( password );
+  };
+
+  User.matchPassword = function( password, encrypted ) {
+    return crypt.match( password, encrypted );
+  };
+
+  User.prototype.matchPassword = function( password ) {
+    return User.matchPassword( password, this.password );
+  };
+
   return User;
 };

@@ -7,7 +7,7 @@ const auth = require( "../util/authentication.js" );
 const base = "/users";
 
 router.get( `${ base }/sign-up`,
-  controller.signUp
+  controller.renderSignUp
 );
 router.post( `${ base }/create`,
   validation.createUser, validation.result,
@@ -15,14 +15,16 @@ router.post( `${ base }/create`,
 );
 
 router.get( `${ base }/sign-in`,
-  controller.signUp
+  controller.renderSignIn
 );
 router.post( `${ base }/sign-in`,
-  controller.signUp
+  validation.signIn, validation.result,
+  controller.signIn
 );
 
 router.get( `${ base }/sign-out`,
-  auth.signOut
+  auth.ensureUser,
+  controller.signOut
 );
 
 module.exports = router;

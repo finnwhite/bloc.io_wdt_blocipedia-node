@@ -1,15 +1,6 @@
 const passport = require( "passport" );
-const bcrypt = require( "bcryptjs" );
 
 module.exports = {
-
-  encrypt( value ) {
-    return bcrypt.hashSync( value, bcrypt.genSaltSync() );
-  },
-
-  match( value, hash ) {
-    return bcrypt.compareSync( value, hash );
-  },
 
   storeUser( req, res, next ) {
     res.locals.user = req.user;

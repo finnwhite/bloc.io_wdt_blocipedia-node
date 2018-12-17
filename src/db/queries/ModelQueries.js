@@ -51,8 +51,8 @@ class ModelQueries {
 
   handleError( err, callback ) {
     /* format error messages */
-    const sq = err.errors[ 0 ].message; // Sequelize error message
     const db = err.original.detail; // database error message
+    const sq = err.errors[ 0 ].message; // Sequelize error message
     const msg = `${ db } ${ sq }`;
     return callback( msg );
   }

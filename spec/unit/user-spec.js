@@ -20,13 +20,13 @@ describe( "User", () => {
       const values = {
         username: "valid",
         email: "valid@example.com",
-        password: "123456",
+        password: "1234567890",
       };
 
       User.create( values )
       .then( ( user ) => {
         expect( user.username ).toBe( values.username ); // "valid"
-        expect( user.password ).toBe( values.password ); // "123456"
+        expect( user.password ).toBe( values.password ); // "1234567890"
         done();
       } )
       .catch( ( err ) => {

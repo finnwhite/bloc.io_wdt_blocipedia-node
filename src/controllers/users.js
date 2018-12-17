@@ -1,21 +1,20 @@
-const UserQueries = require( "../db/queries/UserQueries.js" );
-const queries = new UserQueries();
+const User = require( "../db/models" ).User;
 const auth = require( "../util/authentication.js" );
 const email = require( "../util/email.js" );
 
 module.exports = {
 
-  signUp( req, res, next ) { res.render( "users/sign-up" ); },
+  renderSignUp( req, res, next ) { res.render( "users/sign-up" ); },
 
   create( req, res, next ) {
 
     const values = {
       username: req.body.username,
       email: req.body.email,
-      password: auth.encrypt( req.body.password )
+      password: User.encryptPassword( req.body.password )
     };
 
-    queries.insert( values, ( err, user ) => {
+    User.queries.insert( values, ( err, user ) => {
       if ( err ) {
         req.flash( "style", "danger" );
         req.flash( "alert", err );
@@ -28,5 +27,11 @@ module.exports = {
       }
     } );
   },
+
+  renderSignIn( req, res, next ) { res.render( "users/sign-in" ); },
+
+  signIn( req, res, next ) { auth.signIn( req, res, next ); },
+
+  signOut( req, res, next ) { auth.signOut( req, res, next ); },
 
 };
