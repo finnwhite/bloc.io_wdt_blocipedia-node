@@ -15,22 +15,22 @@
       <form method="POST" action="/users/create">
         <div class="form-group">
           <label for="username">Username:</label>
-          <input type="text" class="form-control" id="username" name="username" placeholder="Choose username" aria-describedby="usernameHelp">
+          <input type="text" class="form-control" name="username" id="username" aria-describedby="usernameHelp" placeholder="Choose username">
           <small id="usernameHelp" class="form-text text-muted">Username must be at least 2 characters in length.</small>
         </div>
         <div class="form-group">
           <label for="email">Email:</label>
-          <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email">
+          <input type="email" class="form-control" name="email" id="email" aria-describedby="emailHelp" placeholder="Enter email">
           <small id="emailHelp" class="form-text text-muted">Email must be a valid email address.</small>
         </div>
         <div class="form-group">
           <label for="password">Password:</label>
-          <input type="password" class="form-control" id="password" name="password" aria-describedby="passwordHelp" placeholder="Choose password">
+          <input type="password" class="form-control" name="password" id="password" aria-describedby="passwordHelp" placeholder="Choose password">
           <small id="passwordHelp" class="form-text text-muted">Password must be at least 4 characters in length.</small>
         </div>
         <div class="form-group">
           <label for="confirmation">Confirm Password:</label>
-          <input type="password" class="form-control" id="confirmation" name="confirmation" aria-describedby="confirmationHelp" placeholder="Confirm password">
+          <input type="password" class="form-control" name="confirmation" id="confirmation" aria-describedby="confirmationHelp" placeholder="Confirm password">
           <small id="confirmationHelp" class="form-text text-muted">Confirmation and password must match.</small>
         </div>
         <button type="submit" class="btn btn-primary">Sign Up</button>
