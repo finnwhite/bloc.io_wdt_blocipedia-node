@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include( "../includes/head-start.ejs",
+      { docTitle: `Blocipedia | Wikis | ${ wiki.title }` }
+    ); -%>
+  </head>
+  <body>
+    <%- include( "../includes/navbar.ejs" ); -%>
+    <main class="container">
+      <%- include( "../includes/messages.ejs" ); -%>
+
+      <h1><%= wiki.title %></h1>
+
+      <% if ( permitEdit || permitDelete ) { -%>
+        <div class="btn-group" role="group" aria-label="Actions">
+          <% if ( permitEdit ) { -%>
+            <a href="/wikis/<%= wiki.id %>/edit" class="btn btn-outline-primary">Edit</a>
+          <% } -%>
+          <% if ( permitDelete ) { -%>
+            <a href="/wikis/<%= wiki.id %>/delete" class="btn btn-outline-primary">Delete</a>
+          <% } -%>
+        </div>
+      <% } -%>
+
+      <% const paras = wiki.body.split( "\n" );
+        paras.forEach( ( para ) => { -%>
+        <p><%= para %></p>
+      <% } ); -%>
+
+    </main>
+    <%- include( "../includes/body-end.ejs" ); -%>
+  </body>
+</html>

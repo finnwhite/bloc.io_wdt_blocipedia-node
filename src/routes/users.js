@@ -2,7 +2,6 @@ const express = require( "express" );
 const router = express.Router();
 const controller = require( "../controllers/users.js" );
 const validation = require( "../util/validation.js" );
-const auth = require( "../util/authentication.js" );
 
 const base = "/users";
 
@@ -23,7 +22,6 @@ router.post( `${ base }/sign-in`,
 );
 
 router.get( `${ base }/sign-out`,
-  auth.ensureUser,
   controller.signOut
 );
 

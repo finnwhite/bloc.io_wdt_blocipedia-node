@@ -13,6 +13,16 @@ module.exports = {
     next();
   },
 
+  signIn: [
+    check( "username" )
+    .not().isEmpty()
+    .withMessage( "must not be empty" ),
+
+    check( "password" )
+    .not().isEmpty()
+    .withMessage( "must not be empty" ),
+  ],
+
   createUser: [
     check( "username" )
     .isLength( { min: 2 } )
@@ -31,14 +41,14 @@ module.exports = {
     .withMessage( "and password must match" ),
   ],
 
-  signIn: [
-    check( "username" )
-    .not().isEmpty()
-    .withMessage( "must not be empty" ),
+  createWiki: [
+    check( "title" )
+    .isLength( { min: 2 } )
+    .withMessage( "must be at least 2 characters in length" ),
 
-    check( "password" )
-    .not().isEmpty()
-    .withMessage( "must not be empty" ),
+    check( "body" )
+    .isLength( { min: 4 } )
+    .withMessage( "must be at least 4 characters in length" ),
   ],
 
 };

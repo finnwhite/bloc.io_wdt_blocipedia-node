@@ -13,12 +13,9 @@ describe( "routes:users", () => {
     auth.signOut( done );
   } );
   beforeEach( ( done ) => {
-    sequelize.sync( { force: true } )
-    .then( () => { done(); } )
-    .catch( ( err ) => {
-      console.log( err );
-      done();
-    } );
+    this.user;
+    sequelize.sync( { force: true } ).then( () => { done(); } )
+    .catch( ( err ) => { console.log( err ); done(); } );
   } );
   afterEach( ( done ) => {
     auth.signOut( done );
@@ -65,10 +62,12 @@ describe( "routes:users", () => {
             expect( user ).not.toBeNull();
 
             const encrypted = user.matchPassword( form.password );
-
-            expect( user.username ).toBe( form.username ); // "valid"
-            expect( user.password ).not.toBe( form.password ); // "1234567890"
-            expect( encrypted ).toBeTruthy(); // password ENCRYPTED!
+            expect( user.username ).toBe( form.username );
+            expect( user.email ).toBe( form.email );
+            expect( user.password ).not.toBe( form.password );
+            expect( encrypted ).toBe( true ); // password ENCRYPTED!
+            expect( user.role ).not.toBe( "guest" ); // default role
+            expect( user.role ).toBe( "standard" ); // default plan
             done();
           } );
         } );
@@ -107,8 +106,8 @@ describe( "routes:users", () => {
     beforeEach( ( done ) => {
 
       const values = {
-        username: "valid",
-        email: "valid@example.com",
+        username: "standard",
+        email: "standard@example.com",
         password: "1234567890",
         role: "standard",
       };
@@ -116,7 +115,12 @@ describe( "routes:users", () => {
       User.create( values )
       .then( ( user ) => {
         expect( user.role ).toBe( "standard" );
-        done();
+        this.user = user;
+
+        auth.signIn( auth.user( user ), ( err, res, body ) => {
+          expect( err ).toBeNull();
+          done();
+        } );
       } );
     } );
 

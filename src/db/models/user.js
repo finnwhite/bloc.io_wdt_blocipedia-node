@@ -31,7 +31,9 @@ module.exports = ( sequelize, DataTypes ) => {
   }, {} );
 
   User.associate = function( models ) {
-    // associations can be defined here
+
+    User.hasMany( models.Wiki, { foreignKey: "creatorId" } );
+
   };
 
   User.queries = new UserQueries( User );

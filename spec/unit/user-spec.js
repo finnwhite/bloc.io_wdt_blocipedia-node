@@ -5,12 +5,8 @@ const User = require( "../../src/db/models" ).User;
 describe( "User", () => {
 
   beforeEach( ( done ) => {
-    sequelize.sync( { force: true } )
-    .then( () => { done(); } )
-    .catch( ( err ) => {
-      console.log( err );
-      done();
-    } );
+    sequelize.sync( { force: true } ).then( () => { done(); } )
+    .catch( ( err ) => { console.log( err ); done(); } );
   } );
 
   describe( ".create()", () => {
@@ -25,8 +21,10 @@ describe( "User", () => {
 
       User.create( values )
       .then( ( user ) => {
-        expect( user.username ).toBe( values.username ); // "valid"
-        expect( user.password ).toBe( values.password ); // "1234567890"
+        expect( user.username ).toBe( values.username );
+        expect( user.email ).toBe( values.email );
+        expect( user.password ).toBe( values.password );
+        expect( user.role ).toBe( "guest" ); // default value
         done();
       } )
       .catch( ( err ) => {

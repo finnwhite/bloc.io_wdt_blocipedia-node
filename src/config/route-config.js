@@ -4,6 +4,7 @@ module.exports = {
 
     app.use( require( "../routes/root.js" ) );
     app.use( require( "../routes/users.js" ) );
+    app.use( require( "../routes/wikis.js" ) );
 
   },
 

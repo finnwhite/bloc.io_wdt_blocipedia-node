@@ -3,7 +3,7 @@
 module.exports = {
 
   up: ( queryInterface, Sequelize ) => {
-    return queryInterface.createTable( "Users", {
+    return queryInterface.createTable( "Wikis", {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -11,24 +11,23 @@ module.exports = {
         primaryKey: true,
       },
 
-      username: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      password: {
+      title: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      role: {
-        type: Sequelize.STRING,
+      body: {
+        type: Sequelize.TEXT,
         allowNull: false,
-        defaultValue: "guest",
+      },
+      private: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      creatorId: {
+        type: Sequelize.INTEGER,
+        references: { model: "Users", key: "id" },
+        onDelete: "CASCADE",
       },
 
       createdAt: {
@@ -43,6 +42,6 @@ module.exports = {
   },
 
   down: ( queryInterface, Sequelize ) => {
-    return queryInterface.dropTable( "Users" );
+    return queryInterface.dropTable( "Wikis" );
   }
 };

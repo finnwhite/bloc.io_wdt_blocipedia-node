@@ -12,6 +12,14 @@ class ModelQueries {
     )
   }
 
+  selectAllScoped( scope = null, callback ) {
+    return (
+      this.model.scope( scope ).findAll()
+      .then( ( records ) => { callback( null, records ); } )
+      .catch( ( err ) => { this.handleError( err, callback ) } )
+    )
+  }
+
   select( id, callback ) {
     return (
       this.model.findByPk( id )
@@ -50,6 +58,7 @@ class ModelQueries {
   }
 
   handleError( err, callback ) {
+    console.log( "QUERY ERROR: %O", err );
     /* format error messages */
     const db = err.original.detail; // database error message
     const sq = err.errors[ 0 ].message; // Sequelize error message

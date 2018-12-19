@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include( "../includes/head-start.ejs",
+      { docTitle: "Blocipedia | Wikis" }
+    ); -%>
+  </head>
+  <body>
+    <%- include( "../includes/navbar.ejs" ); -%>
+    <main class="container">
+      <%- include( "../includes/messages.ejs" ); -%>
+
+      <h1>Public Wikis</h1>
+
+      <% if ( permitNew ) { -%>
+        <a href="/wikis/new" class="btn btn-outline-primary">New Wiki</a>
+      <% } -%>
+
+      <ul class="list-group list-group-flush">
+        <% wikis.forEach( ( wiki ) => {
+          const preview = wiki.body.split( "\n" )[ 0 ]; -%>
+          <li class="list-group-item px-0">
+            <article>
+              <header class="navbar p-0">
+                <h1 class="h5 col px-0 text-truncate">
+                  <a href="/wikis/<%= wiki.id %>"><%= wiki.title %></a>
+                </h1>
+              </header>
+              <p class="text-truncate"><%= preview %></p>
+              <footer>
+                <small class="text-muted text-truncate">Last update: <%= wiki.updatedAt.toLocaleString() %></small>
+              </footer>
+            </article>
+          </li>
+        <% } ); -%>
+      </ul>
+
+    </main>
+    <%- include( "../includes/body-end.ejs" ); -%>
+  </body>
+</html>

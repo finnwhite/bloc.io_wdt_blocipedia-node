@@ -11,7 +11,8 @@ module.exports = {
     const values = {
       username: req.body.username,
       email: req.body.email,
-      password: User.encryptPassword( req.body.password )
+      password: User.encryptPassword( req.body.password ),
+      role: ( req.body.plan || "standard" ),
     };
 
     User.queries.insert( values, ( err, user ) => {
