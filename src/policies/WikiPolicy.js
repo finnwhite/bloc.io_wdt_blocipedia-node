@@ -6,25 +6,39 @@ class WikiPolicy extends ApplicationPolicy {
     super( user, record );
   }
 
-  _isCreator() { return (
-    this.user && this.record && ( this.record.creatorId == this.user.id )
-  ) }
+  _isCreator() {
+    return (
+      this.user && this.record && ( this.record.creatorId == this.user.id )
+    )
+  }
+  _isCollaborator() { return this._isCreator(); } // TODO: expand
+
+  _isPrivate() { return ( this.record && this.record.private ) }
+  _isPublic() { return !this._isPrivate() }
 
   create() { return this.standard(); }
   createPublic() { return this.standard(); }
   createPrivate() { return this.premium(); }
 
-  update() { return this.standard(); }
-  updatePrivate() { return (
-    this._isAdmin() || ( this.update() && this._isOwner() )
-  ) }
-  makePublic() { return this.updatePrivate(); }
-  makePrivate() { return ( this.updatePrivate() && this.createPrivate() ) }
+  read() {
+    return (
+      this._isPublic() || this._isCollaborator() || this._isAdmin()
+    )
+  }
 
-  delete() { return (
-    this._isAdmin() || ( this.update() && this._isOwner() )
-  ) }
+  update() {
+    return (
+      ( this._isPublic() && this._isMember() )
+      || this._isCollaborator() || this._isAdmin()
+    )
+  }
+  makePublic() { return ( this._isOwner() || this._isAdmin() ) }
+  makePrivate() {
+    return (
+      ( this._isOwner() && this.createPrivate() ) || this._isAdmin()
+    )
+  }
 
-};
+}
 
 module.exports = WikiPolicy;

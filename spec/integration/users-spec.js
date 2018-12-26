@@ -66,8 +66,7 @@ describe( "routes:users", () => {
             expect( user.email ).toBe( form.email );
             expect( user.password ).not.toBe( form.password );
             expect( encrypted ).toBe( true ); // password ENCRYPTED!
-            expect( user.role ).not.toBe( "guest" ); // default role
-            expect( user.role ).toBe( "standard" ); // default plan
+            expect( user.role ).toBe( "standard" ); // default role/plan
             done();
           } );
         } );

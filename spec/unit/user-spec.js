@@ -24,7 +24,7 @@ describe( "User", () => {
         expect( user.username ).toBe( values.username );
         expect( user.email ).toBe( values.email );
         expect( user.password ).toBe( values.password );
-        expect( user.role ).toBe( "guest" ); // default value
+        expect( user.role ).toBe( "standard" ); // default value
         done();
       } )
       .catch( ( err ) => {
