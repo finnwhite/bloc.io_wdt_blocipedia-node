@@ -26,9 +26,13 @@ module.exports = {
       }
       req.logIn( user, ( err ) => {
         if ( err ) { return next( err ); }
-        req.flash( "style", "success" );
-        req.flash( "alert", "You have successfully signed in!" );
-        return res.redirect( ( options.successRedirect || "/" ) );
+
+        const msg = options.successFlash;
+        if ( msg !== false ) {
+          req.flash( "style", "success" );
+          req.flash( "alert", ( msg || "You have successfully signed in!" ) );
+        }
+        return res.redirect( ( options.successRedirect || "/users/profile" ) );
       } );
     } )( req, res, next );
   },

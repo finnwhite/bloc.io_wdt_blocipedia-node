@@ -105,8 +105,8 @@ describe( "routes:users", () => {
     beforeEach( ( done ) => {
 
       const values = {
-        username: "standard",
-        email: "standard@example.com",
+        username: "std-user",
+        email: "std@example.com",
         password: "1234567890",
         role: "standard",
       };
@@ -140,8 +140,108 @@ describe( "routes:users", () => {
     } );
     /* END: GET /users/sign-in ----- */
 
+    describe( "GET /users/profile", () => {
+
+      it( "should render the Profile page with the current user's " +
+          "username, email, and membership plan", ( done ) => {
+
+        const url = `${ base }/profile`;
+
+        request.get( url, ( err, res, body ) => {
+          expect( err ).toBeNull();
+          expect( res.statusCode ).toBe( 200 );
+          expect( body ).toContain( "Blocipedia | Profile" );
+          expect( body ).toContain( this.user.username ); // "std-user"
+          expect( body ).toContain( this.user.email ); // "std@example.com"
+          expect( body ).toContain( this.user.role ); // "standard"
+          done();
+        } );
+      } );
+
+    } );
+    /* END: GET /users/profile ----- */
+
+    describe( "POST /users/upgrade-plan", () => {
+
+      it( "should upgrade current user to premium plan " +
+          "when supplied valid values", ( done ) => {
+
+        const url = `${ base }/upgrade-plan`;
+        const form = {
+          plan: "premium",
+          stripeToken: "tok_visa", // stripe test token
+          stripeEmail: this.user.email,
+        };
+        const options = { url, form };
+
+        request.post( options, ( err, res, body ) => {
+          expect( err ).toBeNull();
+          expect( res.statusCode ).toBe( 302 );
+
+          this.user.reload()
+          .then( ( user ) => {
+            expect( user.role ).not.toBe( "standard" );
+            expect( user.role ).toBe( "premium" ); // upgraded
+            done();
+          } );
+        } );
+      } );
+
+    } );
+    /* END: POST /users/upgrade-plan ----- */
+
   } );
   /* END: routes:users:standard ----- */
+
+  describe( ":premium", () => {
+
+    beforeEach( ( done ) => {
+
+      const values = {
+        username: "prm-user",
+        email: "prm@example.com",
+        password: "1234567890",
+        role: "premium",
+      };
+
+      User.create( values )
+      .then( ( user ) => {
+        expect( user.role ).toBe( "premium" );
+        this.user = user;
+
+        auth.signIn( auth.user( user ), ( err, res, body ) => {
+          expect( err ).toBeNull();
+          done();
+        } );
+      } );
+    } );
+
+    describe( "POST /users/downgrade-plan", () => {
+
+      it( "should downgrade current user to standard plan", ( done ) => {
+
+        const url = `${ base }/downgrade-plan`;
+        const form = { plan: "standard" };
+        const options = { url, form };
+
+        request.post( options, ( err, res, body ) => {
+          expect( err ).toBeNull();
+          expect( res.statusCode ).toBe( 302 );
+
+          this.user.reload()
+          .then( ( user ) => {
+            expect( user.role ).not.toBe( "premium" );
+            expect( user.role ).toBe( "standard" ); // downgraded
+            done();
+          } );
+        } );
+      } );
+
+    } );
+    /* END: POST /users/downgrade-plan ----- */
+
+  } );
+  /* END: routes:users:premium ----- */
 
 } );
 /* END: routes:users ----- */

@@ -1,8 +1,6 @@
 require( "dotenv" ).config();
-require( "../config/env-config.js" ).init();
 
 const email = require( "./email.js" );
+const to = "test <test@blocipedia.com>";
 
-email.service.send(
-  email.messages.welcome( "test <test@blocipedia.com>" ), email.logResult()
-);
+email.service.send( email.messages.welcome( to ), email.logResult() );

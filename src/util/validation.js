@@ -51,4 +51,10 @@ module.exports = {
     .withMessage( "must be at least 4 characters in length" ),
   ],
 
+  updatePlan: [
+    check( "plan" )
+    .isIn( [ "standard", "premium" ] )
+    .withMessage( "must be a valid plan type" ),
+  ],
+
 };

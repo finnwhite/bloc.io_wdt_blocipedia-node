@@ -10,13 +10,12 @@
       </li>
       <% if ( user ) { -%>
         <li class="nav-item">
-          <a class="nav-link" href="#">Profile</a>
+          <a class="nav-link" href="/users/profile" aria-label="Profile">
+            <span class="badge badge-primary"><%= user.username %></span>
+          </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/users/sign-out">Sign Out</a>
-        </li>
-        <li class="nav-item">
-          <span class="badge badge-dark"><%= user.username %></span>
         </li>
       <% } else { -%>
         <li class="nav-item">
