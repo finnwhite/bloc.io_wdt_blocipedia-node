@@ -24,11 +24,11 @@ class ApplicationPolicy {
 
   create() { return this._isMember(); }
   new() { return this.create(); }
-  add() { return this.create(); }
+  add() { return this.new(); } // alias of new()
 
   read() { return true; }
   view() { return this.read(); }
-  show() { return this.read(); }
+  show() { return this.view(); } // alias of view()
 
   update() { return ( this._isOwner() || this._isAdmin() ) }
   edit() { return this.update(); }

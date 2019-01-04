@@ -13,10 +13,13 @@ class WikiPolicy extends ApplicationPolicy {
   }
   _isCollaborator() { return this._isCreator(); } // TODO: expand
 
-  _isPrivate() { return ( this.record && this.record.private ) }
+  _isPrivate() { return ( this.record && ( this.record.private == 1 ) ) }
   _isPublic() { return !this._isPrivate() }
 
-  create() { return this.standard(); }
+  create() {
+    if ( this._isPrivate() ) { return this.createPrivate(); }
+    else { return this.createPublic(); }
+  }
   createPublic() { return this.standard(); }
   createPrivate() { return this.premium(); }
 
@@ -27,10 +30,8 @@ class WikiPolicy extends ApplicationPolicy {
   }
 
   update() {
-    return (
-      ( this._isPublic() && this._isMember() )
-      || this._isCollaborator() || this._isAdmin()
-    )
+    if ( this._isPublic() ) { return this._isMember(); }
+    else { return ( this._isCollaborator() || this._isAdmin() ) }
   }
   makePublic() { return ( this._isOwner() || this._isAdmin() ) }
   makePrivate() {

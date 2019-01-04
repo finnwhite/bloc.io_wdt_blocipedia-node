@@ -12,12 +12,12 @@
 
       <h1><%= wiki.title %></h1>
 
-      <% if ( permitEdit || permitDelete ) { -%>
+      <% if ( showEdit || showDelete ) { -%>
         <div class="btn-group" role="group" aria-label="Actions">
-          <% if ( permitEdit ) { -%>
+          <% if ( showEdit ) { -%>
             <a href="/wikis/<%= wiki.id %>/edit" class="btn btn-outline-primary">Edit</a>
           <% } -%>
-          <% if ( permitDelete ) { -%>
+          <% if ( showDelete ) { -%>
             <a href="/wikis/<%= wiki.id %>/delete" class="btn btn-outline-primary">Delete</a>
           <% } -%>
         </div>

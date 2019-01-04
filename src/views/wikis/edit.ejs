@@ -17,13 +17,13 @@
           <% const attr = { pub: [], prv: [] };
             if ( wiki.private ) { attr.prv.push( "checked" ); }
             else { attr.pub.push( "checked" ); }
-            if ( !permitPublic ) { attr.pub.push( "disabled" ); }
-            if ( !permitPrivate ) { attr.prv.push( "disabled" ); } -%>
+            if ( !enablePublic ) { attr.pub.push( "disabled" ); }
+            if ( !enablePrivate ) { attr.prv.push( "disabled" ); } -%>
           <div class="form-check form-check-inline">
             <input type="radio" class="form-check-input" name="private" id="makePublic" aria-label="Make public" value="0" <%= attr.pub.join( " " ); %>>
             <label for="makePublic" class="form-check-label badge badge-secondary text-white">public</label>
           </div>
-          <% if ( wiki.private || permitPrivate ) { -%>
+          <% if ( wiki.private || enablePrivate ) { -%>
             <div class="form-check form-check-inline">
               <input type="radio" class="form-check-input" name="private" id="makePrivate" aria-label="Make private" value="1" <%= attr.prv.join( " " ); %>>
               <label for="makePrivate" class="form-check-label badge badge-secondary text-white">private</label>

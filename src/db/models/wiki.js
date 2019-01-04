@@ -22,7 +22,14 @@ module.exports = ( sequelize, DataTypes ) => {
     },
   }, {
     scopes: {
-      public: { where: { private: false } },
+      public: {
+        where: { private: false },
+        order: [ [ "updatedAt", "DESC" ] ],
+      },
+      private: {
+        where: { private: true },
+        order: [ [ "updatedAt", "DESC" ] ],
+      },
     },
   } );
 

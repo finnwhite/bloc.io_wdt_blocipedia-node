@@ -67,8 +67,8 @@ describe( "routes:wikis", () => {
 
     describe( "GET /wikis", () => {
 
-      it( "should render the Wikis page AND " +
-          "display PUBLIC wikis only", ( done ) => {
+      it( "should render the Wikis page " +
+          "AND display PUBLIC wikis only", ( done ) => {
 
         const url = base;
 
@@ -144,13 +144,14 @@ describe( "routes:wikis", () => {
 
     describe( "POST /wikis/create", () => {
 
-      it( "should create new wiki when supplied valid values", ( done ) => {
+      it( "should create a new public wiki " +
+          "when supplied valid values", ( done ) => {
 
         const url = `${ base }/create`;
         const form = {
           title: "Toddler Tunes",
           body: "Head, shoulders, knees and toes, knees and toes.",
-          creatorId: this.user.id,
+          private: "0",
         };
         const options = { url, form };
 
@@ -171,12 +172,14 @@ describe( "routes:wikis", () => {
         } );
       } );
 
-      it( "should NOT create new wiki when supplied INVALID values", ( done ) => {
+      it( "should NOT create new wiki " +
+          "when supplied INVALID values", ( done ) => {
 
         const url = `${ base }/create`;
         const form = {
           title: "Z",
           body: "Zzz",
+          private: "0",
         };
         const options = { url, form };
 
@@ -205,7 +208,20 @@ describe( "routes:wikis", () => {
         request.get( url, ( err, res, body ) => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 200 );
-          expect( body ).toContain( `Blocipedia | Wikis | ${ wiki.title }` );
+          expect( body ).toContain( `Wikis | ${ wiki.title }` );
+          done();
+        } );
+      } );
+
+      it( "should NOT render the requested PRIVATE wiki", ( done ) => {
+
+        const wiki = this.wiki.private; // "Changing A Dirty Diaper"
+        const url = `${ base }/${ wiki.id }`;
+
+        request.get( url, ( err, res, body ) => {
+          expect( err ).toBeNull();
+          expect( res.statusCode ).toBe( 200 );
+          expect( body ).not.toContain( `Wikis | ${ wiki.title }` );
           done();
         } );
       } );
@@ -241,6 +257,7 @@ describe( "routes:wikis", () => {
         const form = {
           title: "Putting A Cranky Toddler To Bed",
           body: "Clear your schedule, this is gonna take a while.",
+          private: "0",
         };
         const options = { url, form };
 
