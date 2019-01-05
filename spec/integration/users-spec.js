@@ -4,6 +4,7 @@ const base = "http://localhost:3000/users";
 
 const sequelize = require( "../../src/db/models" ).sequelize;
 const User = require( "../../src/db/models" ).User;
+const Wiki = require( "../../src/db/models" ).Wiki;
 const auth = require( "../support/mock-auth.js" );
 
 
@@ -14,6 +15,7 @@ describe( "routes:users", () => {
   } );
   beforeEach( ( done ) => {
     this.user;
+    this.wiki = {};
     sequelize.sync( { force: true } ).then( () => { done(); } )
     .catch( ( err ) => { console.log( err ); done(); } );
   } );
@@ -140,17 +142,17 @@ describe( "routes:users", () => {
     } );
     /* END: GET /users/sign-in ----- */
 
-    describe( "GET /users/profile", () => {
+    describe( "GET /users/account", () => {
 
-      it( "should render the Profile page with the current user's " +
+      it( "should render the Account page with the current user's " +
           "username, email, and membership plan", ( done ) => {
 
-        const url = `${ base }/profile`;
+        const url = `${ base }/account`;
 
         request.get( url, ( err, res, body ) => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 200 );
-          expect( body ).toContain( "Blocipedia | Profile" );
+          expect( body ).toContain( "Blocipedia | Account" );
           expect( body ).toContain( this.user.username ); // "std-user"
           expect( body ).toContain( this.user.email ); // "std@example.com"
           expect( body ).toContain( this.user.role ); // "standard"
@@ -159,7 +161,7 @@ describe( "routes:users", () => {
       } );
 
     } );
-    /* END: GET /users/profile ----- */
+    /* END: GET /users/account ----- */
 
     describe( "POST /users/upgrade-plan", () => {
 
@@ -208,31 +210,72 @@ describe( "routes:users", () => {
       .then( ( user ) => {
         expect( user.role ).toBe( "premium" );
         this.user = user;
+        this.wiki.byUser = {};
 
-        auth.signIn( auth.user( user ), ( err, res, body ) => {
-          expect( err ).toBeNull();
-          done();
+        const values = {
+          title: "Getting A Toddler To Wear A Bib",
+          body: "So much yogurt. So much laundry.",
+          creatorId: user.id,
+        };
+
+        Wiki.create( values )
+        .then( ( wiki ) => {
+          expect( wiki.private ).toBe( false ); // default value
+          this.wiki.byUser.public = wiki;
+
+          const values = {
+            title: "Frustrating Toddlers",
+            body: "Take a deep breath and count to ten.",
+            private: true,
+            creatorId: user.id,
+          };
+
+          Wiki.create( values )
+          .then( ( wiki ) => {
+            expect( wiki.private ).toBe( true );
+            this.wiki.byUser.private = wiki;
+
+            auth.signIn( auth.user( user ), ( err, res, body ) => {
+              expect( err ).toBeNull();
+              done();
+            } );
+          } );
         } );
       } );
     } );
 
     describe( "POST /users/downgrade-plan", () => {
 
-      it( "should downgrade current user to standard plan", ( done ) => {
+      it( "should downgrade current user to standard plan " +
+          "AND make PUBLIC all PRIVATE wikis created by user", ( done ) => {
 
-        const url = `${ base }/downgrade-plan`;
-        const form = { plan: "standard" };
-        const options = { url, form };
+        const scope = [
+          "private", { method: [ "byCreatorId", this.user.id ] }
+        ];
+        const wikis = Wiki.scope( scope );
+        wikis.count()
+        .then( ( countBefore ) => {
+          expect( countBefore ).toBeGreaterThan( 0 );
 
-        request.post( options, ( err, res, body ) => {
-          expect( err ).toBeNull();
-          expect( res.statusCode ).toBe( 302 );
+          const url = `${ base }/downgrade-plan`;
+          const form = { plan: "standard" };
+          const options = { url, form };
 
-          this.user.reload()
-          .then( ( user ) => {
-            expect( user.role ).not.toBe( "premium" );
-            expect( user.role ).toBe( "standard" ); // downgraded
-            done();
+          request.post( options, ( err, res, body ) => {
+            expect( err ).toBeNull();
+            expect( res.statusCode ).toBe( 302 );
+
+            this.user.reload()
+            .then( ( user ) => {
+              expect( user.role ).not.toBe( "premium" );
+              expect( user.role ).toBe( "standard" ); // downgraded
+
+              wikis.count()
+              .then( ( countAfter ) => {
+                expect( countAfter ).toBe( 0 ); // private wikis made public
+                done();
+              } );
+            } );
           } );
         } );
       } );

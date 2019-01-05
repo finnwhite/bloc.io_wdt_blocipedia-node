@@ -68,7 +68,7 @@ describe( "routes:wikis", () => {
     describe( "GET /wikis", () => {
 
       it( "should render the Wikis page " +
-          "AND display PUBLIC wikis only", ( done ) => {
+          "AND display only PUBLIC wikis", ( done ) => {
 
         const url = base;
 
@@ -144,7 +144,7 @@ describe( "routes:wikis", () => {
 
     describe( "POST /wikis/create", () => {
 
-      it( "should create a new public wiki " +
+      it( "should create a new PUBLIC wiki " +
           "when supplied valid values", ( done ) => {
 
         const url = `${ base }/create`;
@@ -172,7 +172,7 @@ describe( "routes:wikis", () => {
         } );
       } );
 
-      it( "should NOT create new wiki " +
+      it( "should NOT create a new wiki " +
           "when supplied INVALID values", ( done ) => {
 
         const url = `${ base }/create`;
@@ -195,12 +195,57 @@ describe( "routes:wikis", () => {
         } );
       } );
 
+      it( "should NOT create a new PRIVATE wiki", ( done ) => {
+
+        const url = `${ base }/create`;
+        const form = {
+          title: "Frustrating Toddlers",
+          body: "Take a breath and count to ten.",
+          private: "1",
+        };
+        const options = { url, form };
+
+        request.post( options, ( err, res, body ) => {
+          expect( err ).toBeNull();
+          expect( res.statusCode ).toBe( 302 );
+
+          Wiki.findOne( { where: { title: form.title } } )
+          .then( ( wiki ) => {
+            expect( wiki ).toBeNull();
+            done();
+          } );
+        } );
+      } );
+
     } );
     /* END: POST /wikis/create ----- */
 
+    describe( "GET /wikis/dashboard", () => {
+
+      it( "should render the current user's Wiki Dashboard page " +
+          "AND display only wikis created by the user", ( done ) => {
+
+        const url = `${ base }/dashboard`;
+
+        request.get( url, ( err, res, body ) => {
+          expect( err ).toBeNull();
+          expect( res.statusCode ).toBe( 200 );
+
+          const wiki = this.wiki;
+          expect( body ).toContain( "Blocipedia | Wiki Dashboard" );
+          expect( body ).toContain( "<h1>My Wikis</h1>" );
+          expect( body ).toContain( wiki.byUser.title ); // "...To Wear A Bib"
+          expect( body ).not.toContain( wiki.public.title ); // "...To Bed"
+          done();
+        } );
+      } );
+
+    } );
+    /* END: GET /wikis/dashboard ----- */
+
     describe( "GET /wikis/:id", () => {
 
-      it( "should render the requested public wiki", ( done ) => {
+      it( "should render the requested PUBLIC wiki", ( done ) => {
 
         const wiki = this.wiki.public; // "Putting A Toddler To Bed"
         const url = `${ base }/${ wiki.id }`;
@@ -231,7 +276,7 @@ describe( "routes:wikis", () => {
 
     describe( "GET /wikis/:id/edit", () => {
 
-      it( "should render a form to edit the requested public wiki", ( done ) => {
+      it( "should render a form to edit a PUBLIC wiki", ( done ) => {
 
         const wiki = this.wiki.public; // "Putting A Toddler To Bed"
         const url = `${ base }/${ wiki.id }/edit`;
@@ -240,6 +285,20 @@ describe( "routes:wikis", () => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 200 );
           expect( body ).toContain( "Blocipedia | Edit Wiki" );
+          expect( body ).toContain( wiki.title );
+          done();
+        } );
+      } );
+
+      it( "should NOT render a form to edit a PRIVATE wiki", ( done ) => {
+
+        const wiki = this.wiki.private; // "Changing A Dirty Diaper"
+        const url = `${ base }/${ wiki.id }`;
+
+        request.get( url, ( err, res, body ) => {
+          expect( err ).toBeNull();
+          expect( res.statusCode ).toBe( 200 );
+          expect( body ).not.toContain( "Blocipedia | Edit Wiki" );
           done();
         } );
       } );
@@ -265,7 +324,7 @@ describe( "routes:wikis", () => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 302 );
 
-          Wiki.findOne( { where: { title: form.title } } )
+          this.wiki.public.reload()
           .then( ( wiki ) => {
             expect( wiki ).not.toBeNull();
 
@@ -287,9 +346,8 @@ describe( "routes:wikis", () => {
 
       it( "should delete a wiki created by the user", ( done ) => {
 
-        Wiki.findAll()
-        .then( ( wikis ) => {
-          const countBefore = wikis.length;
+        Wiki.count()
+        .then( ( countBefore ) => {
           expect( countBefore ).toBeGreaterThan( 0 );
 
           const wiki = this.wiki.byUser; // "Getting A Toddler To Wear A Bib"
@@ -300,9 +358,32 @@ describe( "routes:wikis", () => {
             expect( err ).toBeNull();
             expect( res.statusCode ).toBe( 200 );
 
-            Wiki.findAll()
-            .then( ( wikis ) => {
-              expect( wikis.length ).toBe( countBefore - 1 );
+            Wiki.count()
+            .then( ( countAfter ) => {
+              expect( countAfter ).toBe( countBefore - 1 );
+              done();
+            } );
+          } );
+        } );
+      } );
+
+      it( "should NOT delete a wiki created by another user", ( done ) => {
+
+        Wiki.count()
+        .then( ( countBefore ) => {
+          expect( countBefore ).toBeGreaterThan( 0 );
+
+          const wiki = this.wiki.public; // "Putting A Toddler To Bed"
+          const url = `${ base }/${ wiki.id }/delete`;
+          expect( wiki.creatorId ).not.toBe( this.user.id );
+
+          request.get( url, ( err, res, body ) => {
+            expect( err ).toBeNull();
+            expect( res.statusCode ).toBe( 200 );
+
+            Wiki.count()
+            .then( ( countAfter ) => {
+              expect( countAfter ).toBe( countBefore );
               done();
             } );
           } );
@@ -314,6 +395,196 @@ describe( "routes:wikis", () => {
 
   } );
   /* END: routes:wikis:standard ----- */
+
+  describe( ":premium", () => {
+
+    beforeEach( ( done ) => {
+
+      const values = {
+        username: "premium",
+        email: "premium@example.com",
+        password: "1234567890",
+        role: "premium",
+      };
+
+      User.create( values )
+      .then( ( user ) => {
+        expect( user.role ).toBe( "premium" );
+        this.user = user;
+        this.wiki.byUser = {};
+
+        const values = {
+          title: "Getting A Toddler To Wear A Bib",
+          body: "So much yogurt. So much laundry.",
+          creatorId: user.id,
+        };
+
+        Wiki.create( values )
+        .then( ( wiki ) => {
+          expect( wiki.private ).toBe( false ); // default value
+          this.wiki.byUser.public = wiki;
+
+          const values = {
+            title: "Frustrating Toddlers",
+            body: "Take a deep breath and count to ten.",
+            private: true,
+            creatorId: user.id,
+          };
+
+          Wiki.create( values )
+          .then( ( wiki ) => {
+            expect( wiki.private ).toBe( true );
+            this.wiki.byUser.private = wiki;
+
+            auth.signIn( auth.user( user ), ( err, res, body ) => {
+              expect( err ).toBeNull();
+              done();
+            } );
+          } );
+        } );
+      } );
+    } );
+
+    describe( "POST /wikis/create", () => {
+
+      it( "should create a new PRIVATE wiki " +
+          "when supplied valid values", ( done ) => {
+
+        const url = `${ base }/create`;
+        const form = {
+          title: "Toddler Tunes",
+          body: "Head, shoulders, knees and toes, knees and toes.",
+          private: "1",
+        };
+        const options = { url, form };
+
+        request.post( options, ( err, res, body ) => {
+          expect( err ).toBeNull();
+          expect( res.statusCode ).toBe( 302 );
+
+          Wiki.findOne( { where: { title: form.title } } )
+          .then( ( wiki ) => {
+            expect( wiki ).not.toBeNull();
+
+            expect( wiki.title ).toBe( form.title );
+            expect( wiki.body ).toBe( form.body );
+            expect( wiki.private ).toBe( true );
+            expect( wiki.creatorId ).toBe( this.user.id );
+            done();
+          } );
+        } );
+      } );
+
+    } );
+    /* END: POST /wikis/create ----- */
+
+    describe( "GET /wikis/:id", () => {
+
+      it( "should render a PRIVATE wiki " +
+          "created by the user", ( done ) => {
+
+        const wiki = this.wiki.byUser.private; // "Frustrating Toddlers"
+        const url = `${ base }/${ wiki.id }`;
+        expect( wiki.creatorId ).toBe( this.user.id );
+
+        request.get( url, ( err, res, body ) => {
+          expect( err ).toBeNull();
+          expect( res.statusCode ).toBe( 200 );
+          expect( body ).toContain( `Wikis | ${ wiki.title }` );
+          done();
+        } );
+      } );
+
+      it( "should NOT render a PRIVATE wiki " +
+          "created by another user", ( done ) => {
+
+        const wiki = this.wiki.private; // "Changing A Dirty Diaper"
+        const url = `${ base }/${ wiki.id }`;
+        expect( wiki.creatorId ).not.toBe( this.user.id );
+
+        request.get( url, ( err, res, body ) => {
+          expect( err ).toBeNull();
+          expect( res.statusCode ).toBe( 200 );
+          expect( body ).not.toContain( `Wikis | ${ wiki.title }` );
+          done();
+        } );
+      } );
+
+    } );
+    /* END: GET /wikis/:id ----- */
+
+    describe( "GET /wikis/:id/edit", () => {
+
+      it( "should render a form to edit a PRIVATE wiki " +
+          "created by the user", ( done ) => {
+
+        const wiki = this.wiki.byUser.private; // "Frustrating Toddlers"
+        const url = `${ base }/${ wiki.id }/edit`;
+        expect( wiki.creatorId ).toBe( this.user.id );
+
+        request.get( url, ( err, res, body ) => {
+          expect( err ).toBeNull();
+          expect( res.statusCode ).toBe( 200 );
+          expect( body ).toContain( "Blocipedia | Edit Wiki" );
+          expect( body ).toContain( wiki.title );
+          done();
+        } );
+      } );
+
+      it( "should NOT render a form to edit a PRIVATE wiki " +
+          "created by another user", ( done ) => {
+
+        const wiki = this.wiki.private; // "Changing A Dirty Diaper"
+        const url = `${ base }/${ wiki.id }`;
+        expect( wiki.creatorId ).not.toBe( this.user.id );
+
+        request.get( url, ( err, res, body ) => {
+          expect( err ).toBeNull();
+          expect( res.statusCode ).toBe( 200 );
+          expect( body ).not.toContain( "Blocipedia | Edit Wiki" );
+          done();
+        } );
+      } );
+
+    } );
+    /* END: GET /wikis/:id/edit ----- */
+
+    describe( "POST /wikis/:id/update", () => {
+
+      it( "should make PRIVATE a PUBLIC wiki " +
+          "created by the user", ( done ) => {
+
+        const wiki = this.wiki.byUser.public; // "...Toddler To Wear A Bib"
+        const before = { ...wiki.get() };
+        const url = `${ base }/${ wiki.id }/update`;
+        const form = {
+          title: wiki.title, // unchanged
+          body: wiki.body, // unchanged
+          private: "1",
+        };
+        const options = { url, form };
+        expect( wiki.creatorId ).toBe( this.user.id );
+
+        request.post( options, ( err, res, body ) => {
+          expect( err ).toBeNull();
+          expect( res.statusCode ).toBe( 302 );
+
+          this.wiki.byUser.public.reload()
+          .then( ( wiki ) => {
+            expect( wiki ).not.toBeNull();
+
+            expect( wiki.private ).not.toBe( before.private );
+            expect( wiki.private ).toBe( true ); // updated
+            done();
+          } );
+        } );
+      } );
+
+    } );
+    /* END: GET /wikis/:id/update ----- */
+
+  } );
+  /* END: routes:wikis:premium ----- */
 
 } );
 /* END: routes:wikis ----- */

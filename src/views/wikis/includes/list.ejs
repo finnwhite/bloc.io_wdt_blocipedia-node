@@ -1,0 +1,24 @@
+<ul class="list-group list-group-flush">
+  <% wikis.forEach( ( wiki ) => {
+    const preview = wiki.body.split( "\n" )[ 0 ];
+    const privacy = wiki.private ? "private" : "public"; -%>
+    <li class="list-group-item px-0">
+      <article>
+        <header class="navbar p-0">
+          <h1 class="h5 px-0 text-truncate">
+            <a href="/wikis/<%= wiki.id %>"><%= wiki.title %></a>
+          </h1>
+        </header>
+        <p class="text-truncate"><%= preview %></p>
+        <footer>
+          <p class="mb-0 text-muted text-truncate">
+            <small>
+              <span class="badge badge-secondary"><%= privacy %></span>
+              Last update: <%= wiki.updatedAt.toLocaleString() %>
+            </small>
+          </p>
+        </footer>
+      </article>
+    </li>
+  <% } ); -%>
+</ul>

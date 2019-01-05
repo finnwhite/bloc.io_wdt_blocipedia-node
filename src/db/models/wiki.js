@@ -30,6 +30,12 @@ module.exports = ( sequelize, DataTypes ) => {
         where: { private: true },
         order: [ [ "updatedAt", "DESC" ] ],
       },
+      byCreatorId: function( id ) {
+        return {
+          where: { creatorId: id },
+          order: [ [ "updatedAt", "DESC" ] ],
+        };
+      },
     },
   } );
 

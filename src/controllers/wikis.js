@@ -4,7 +4,8 @@ const WikiPolicy = require( "../policies/WikiPolicy.js" );
 module.exports = {
 
   index( req, res, next ) {
-    Wiki.queries.selectAllScoped( "public", ( err, wikis ) => {
+    const scope = "public";
+    Wiki.queries.selectAllScoped( scope, ( err, wikis ) => {
       if ( err ) {
         req.flash( "style", "danger" );
         req.flash( "alert", err );
@@ -55,6 +56,22 @@ module.exports = {
       req.flash( "alert", "You are not authorized to do that." );
       res.redirect( ( req.headers.referer || "/wikis" ) );
     }
+  },
+
+  dashboard( req, res, next ) {
+    const scope = { method: [ "byCreatorId", req.user.id ] };
+    Wiki.queries.selectAllScoped( scope, ( err, wikis ) => {
+      if ( err ) {
+        req.flash( "style", "danger" );
+        req.flash( "alert", err );
+        res.redirect( ( req.headers.referer || "/" ) );
+      }
+      else {
+        const channel = "My Wikis";
+        const showNew = new WikiPolicy( req.user ).new();
+        res.render( "wikis/dashboard", { wikis, channel, showNew } );
+      }
+    } );
   },
 
   view( req, res, next ) {
@@ -147,7 +164,7 @@ module.exports = {
               req.flash( "alert", err );
               res.redirect( ( req.headers.referer || "." ) ); // /wikis/:id
             }
-            else { res.redirect( "/wikis" ); }
+            else { res.redirect( "/wikis/dashboard" ); } // TODO: contextual
           } );
         }
         else {

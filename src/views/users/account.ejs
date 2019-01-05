@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include( "../includes/head-start.ejs",
+      { docTitle: "Blocipedia | Account" }
+    ); -%>
+  </head>
+  <body>
+    <%- include( "../includes/navbar.ejs" ); -%>
+    <main class="container">
+      <%- include( "../includes/messages.ejs" ); -%>
+
+      <h1><%= user.username %> <span class="badge badge-secondary"><%= user.role %></span></h1>
+      <p class="text-muted"><%= user.email %></p>
+
+      <% if ( showUpgrade ) { -%>
+        <form method="POST" action="/users/upgrade-plan">
+          <input type="hidden" name="plan" value="premium">
+          <script
+            src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+            data-key="<%= process.env.STRIPE_API_KEY %>"
+            data-name="Blocipedia"
+            data-description="Premium Plan"
+            data-amount="1499"
+            data-locale="auto"
+            data-zip-code="true"
+            data-email="<%= user.email %>"
+            data-label="Upgrade to Premium"
+            data-allow-remember-me="false"
+          ></script>
+        </form>
+      <% } -%>
+      <% if ( showDowngrade ) { -%>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#downgradeModal">Downgrade to Standard</button>
+      <% } -%>
+
+      <hr>
+
+    </main>
+
+    <% if ( showDowngrade ) { -%>
+      <div class="modal fade" id="downgradeModal" tabindex="-1" role="dialog" aria-labelledby="downgradeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="downgradeModalLabel">Confirm: Downgrade to Standard</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <ul>
+                <li>You will lose access to your Premium Plan features.</li>
+                <li>You will no longer be able to <strong class="text-danger">create private wikis</strong>.</li>
+                <li>All private wikis you created will be <strong class="text-danger">made public</strong>.</li>
+                <li>You will be required to <strong class="text-danger">re-purchase</strong> a Premium Plan if you wish to regain access to your Premium Plan features.</li>
+              </ul>
+            </div>
+            <div class="modal-footer">
+              <span>Are you sure?</span>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <form method="POST" action="/users/downgrade-plan">
+                <input type="hidden" name="plan" value="standard">
+                <button type="submit" class="btn btn-primary">Downgrade to Standard</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% } -%>
+
+    <%- include( "../includes/body-end.ejs" ); -%>
+  </body>
+</html>

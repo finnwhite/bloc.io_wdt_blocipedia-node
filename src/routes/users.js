@@ -26,9 +26,9 @@ router.get( `${ base }/sign-out`,
   controller.signOut
 );
 
-router.get( `${ base }/profile`,
+router.get( `${ base }/account`,
   auth.ensureUser,
-  controller.profile
+  controller.account
 );
 
 router.post( `${ base }/upgrade-plan`,

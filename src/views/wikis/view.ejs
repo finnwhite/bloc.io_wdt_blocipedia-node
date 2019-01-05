@@ -28,6 +28,14 @@
         <p><%= para %></p>
       <% } ); -%>
 
+      <% const privacy = wiki.private ? "private" : "public"; -%>
+      <footer>
+        <p class="text-muted">
+          <span class="badge badge-secondary"><%= privacy %></span>
+          Last update: <%= wiki.updatedAt.toLocaleString() %>
+        </p>
+      </footer>
+
     </main>
     <%- include( "../includes/body-end.ejs" ); -%>
   </body>

@@ -20,6 +20,11 @@ router.post( `${ base }/create`,
   controller.create
 );
 
+router.get( `${ base }/dashboard`,
+  auth.ensureUser,
+  controller.dashboard
+);
+
 router.get( `${ base }/:id`,
   controller.view
 );

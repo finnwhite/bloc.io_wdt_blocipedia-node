@@ -32,7 +32,7 @@ module.exports = {
           req.flash( "style", "success" );
           req.flash( "alert", ( msg || "You have successfully signed in!" ) );
         }
-        return res.redirect( ( options.successRedirect || "/users/profile" ) );
+        return res.redirect( ( options.successRedirect || "/users/account" ) );
       } );
     } )( req, res, next );
   },

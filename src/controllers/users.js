@@ -1,4 +1,5 @@
 const User = require( "../db/models" ).User;
+const Wiki = require( "../db/models" ).Wiki;
 const auth = require( "../util/authentication.js" );
 const email = require( "../util/email.js" );
 const payments = require( "../util/payments.js" );
@@ -38,7 +39,7 @@ module.exports = {
 
   signOut( req, res, next ) { auth.signOut( req, res, next ); },
 
-  profile( req, res, next ) { // TODO: implement policy check?
+  account( req, res, next ) {
     User.queries.select( req.user.id, ( err, user ) => {
       if ( err ) {
         req.flash( "style", "danger" );
@@ -48,7 +49,7 @@ module.exports = {
       else {
         const showUpgrade = ( user.role === "standard" );
         const showDowngrade = ( user.role === "premium" );
-        res.render( "users/profile", { user, showUpgrade, showDowngrade } );
+        res.render( "users/account", { user, showUpgrade, showDowngrade } );
       }
     } );
   },
@@ -64,21 +65,21 @@ module.exports = {
         if ( err ) {
           req.flash( "style", "danger" );
           req.flash( "alert", err );
-          res.redirect( ( req.headers.referer || "/users/profile" ) );
+          res.redirect( ( req.headers.referer || "/users/account" ) );
         }
         else {
           User.queries.update( user.id, { role: plan }, ( err, user ) => {
             if ( err ) {
               req.flash( "style", "danger" );
               req.flash( "alert", err );
-              res.redirect( ( req.headers.referer || "/users/profile" ) );
+              res.redirect( ( req.headers.referer || "/users/account" ) );
             }
             else {
               req.flash( "style", "success" );
               req.flash( "alert", ( "You have successfully upgraded " +
                 `to the ${ plan.toUpperCase() } plan!` )
               );
-              res.redirect( "/users/profile" );
+              res.redirect( "/users/account" );
             }
           } );
         }
@@ -95,14 +96,25 @@ module.exports = {
       if ( err ) {
         req.flash( "style", "danger" );
         req.flash( "alert", err );
-        res.redirect( ( req.headers.referer || "/users/profile" ) );
+        res.redirect( ( req.headers.referer || "/users/account" ) );
       }
       else {
-        req.flash( "style", "success" );
         req.flash( "alert", ( "You have successfully downgraded " +
           `to the ${ plan.toUpperCase() } plan.` )
         );
-        res.redirect( "/users/profile" );
+
+        Wiki.queries.makePublic( user.id, ( err, affected ) => {
+          if ( err ) {
+            req.flash( "style", "warning" );
+            req.flash( "alert", `ERROR: ${ err }` );
+          }
+          else {
+            const count = affected[ 0 ];
+            req.flash( "style", "success" );
+            req.flash( "alert", `${ count } private wikis were made public.` );
+          }
+          res.redirect( "/users/account" );
+        } );
       }
     } );
   },

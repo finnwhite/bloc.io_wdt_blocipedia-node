@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <%- include( "../includes/head-start.ejs",
-      { docTitle: "Blocipedia | Wikis" }
+      { docTitle: "Blocipedia | Wiki Dashboard" }
     ); -%>
   </head>
   <body>
@@ -10,7 +10,7 @@
     <main class="container">
       <%- include( "../includes/messages.ejs" ); -%>
 
-      <h1>Public Wikis</h1>
+      <h1><%= channel %></h1>
 
       <% if ( showNew ) { -%>
         <a href="/wikis/new" class="btn btn-outline-primary">New Wiki</a>
