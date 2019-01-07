@@ -1,7 +1,5 @@
 <ul class="list-group list-group-flush">
-  <% wikis.forEach( ( wiki ) => {
-    const preview = wiki.body.split( "\n" )[ 0 ];
-    const privacy = wiki.private ? "private" : "public"; -%>
+  <% wikis.forEach( ( wiki ) => { -%>
     <li class="list-group-item px-0">
       <article>
         <header class="navbar p-0">
@@ -9,11 +7,11 @@
             <a href="/wikis/<%= wiki.id %>"><%= wiki.title %></a>
           </h1>
         </header>
-        <p class="text-truncate"><%= preview %></p>
+        <p class="text-truncate"><%= wiki.getBodyPreview() %></p>
         <footer>
           <p class="mb-0 text-muted text-truncate">
             <small>
-              <span class="badge badge-secondary"><%= privacy %></span>
+              <span class="badge badge-secondary"><%= wiki.getPrivacy() %></span>
               Last update: <%= wiki.updatedAt.toLocaleString() %>
             </small>
           </p>

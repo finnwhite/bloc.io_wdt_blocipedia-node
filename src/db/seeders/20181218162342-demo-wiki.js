@@ -15,7 +15,7 @@ function randomInt( min, max ) {
 for ( let i = 0; i < count; i++ ) {
   values.push( {
     title: faker.lorem.sentence(),
-    body: faker.lorem.paragraphs( randomInt( paras.min, paras.max ), "\n" ),
+    body: faker.lorem.paragraphs( randomInt( paras.min, paras.max ), "\n\n" ),
     private: faker.random.boolean(),
     creatorId: randomInt( 1, userCount ),
     createdAt: new Date(),

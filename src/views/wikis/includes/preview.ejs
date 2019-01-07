@@ -1,0 +1,13 @@
+<script src="/scripts/markdown.min.js"></script>
+<script>
+  function Preview( preview, title, body ) {
+    this.update = function () {
+      var md = "# " + title.value + "\n\n" + body.value;
+      preview.innerHTML = markdown.toHTML( md );
+    };
+    title.preview = body.preview = this;
+    this.update();
+  }
+  var $ = function ( id ) { return document.getElementById( id ); };
+  new Preview( $( "preview" ), $( "title" ), $( "body" ) );
+</script>

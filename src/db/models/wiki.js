@@ -1,6 +1,8 @@
 'use strict';
 
 const WikiQueries = require( "../queries/WikiQueries.js" );
+const text = require( "../../util/text.js" );
+const markdown = require( "markdown" ).markdown;
 
 module.exports = ( sequelize, DataTypes ) => {
 
@@ -46,6 +48,16 @@ module.exports = ( sequelize, DataTypes ) => {
   };
 
   Wiki.queries = new WikiQueries( Wiki );
+
+  Wiki.prototype.getBodyHtml = function() {
+    return markdown.toHTML( this.body );
+  };
+  Wiki.prototype.getBodyPreview = function() {
+    return text.getLineByNum( this.body, 1 );
+  };
+  Wiki.prototype.getPrivacy = function() {
+    return this.private ? "private" : "public";
+  };
 
   return Wiki;
 };

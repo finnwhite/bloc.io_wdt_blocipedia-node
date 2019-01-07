@@ -23,15 +23,11 @@
         </div>
       <% } -%>
 
-      <% const paras = wiki.body.split( "\n" );
-        paras.forEach( ( para ) => { -%>
-        <p><%= para %></p>
-      <% } ); -%>
+      <div class="markdown"><%- wiki.getBodyHtml() -%></div>
 
-      <% const privacy = wiki.private ? "private" : "public"; -%>
       <footer>
         <p class="text-muted">
-          <span class="badge badge-secondary"><%= privacy %></span>
+          <span class="badge badge-secondary"><%= wiki.getPrivacy() %></span>
           Last update: <%= wiki.updatedAt.toLocaleString() %>
         </p>
       </footer>
