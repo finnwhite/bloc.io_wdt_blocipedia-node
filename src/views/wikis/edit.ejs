@@ -7,13 +7,14 @@
   </head>
   <body>
     <%- include( "../includes/navbar.ejs" ); -%>
-    <main class="container">
+    <main class="container px-0 py-3">
       <%- include( "../includes/messages.ejs" ); -%>
-
-      <h1>Edit Wiki</h1>
 
       <div class="row">
         <div class="col-md">
+
+          <h1>Edit Wiki</h1>
+
           <form method="POST" action="/wikis/<%= wiki.id %>/update">
             <div class="form-group">
               <% const attr = { pub: [], prv: [] };
@@ -21,14 +22,14 @@
                 else { attr.pub.push( "checked" ); }
                 if ( !enablePublic ) { attr.pub.push( "disabled" ); }
                 if ( !enablePrivate ) { attr.prv.push( "disabled" ); } -%>
-              <div class="form-check form-check-inline">
+              <div class="form-check form-check-inline mr-2">
                 <input type="radio" class="form-check-input" name="private" id="makePublic" aria-label="Make public" value="0" <%= attr.pub.join( " " ); %>>
                 <label for="makePublic" class="form-check-label badge badge-secondary text-white">public</label>
               </div>
               <% if ( wiki.private || enablePrivate ) { -%>
                 <div class="form-check form-check-inline">
                   <input type="radio" class="form-check-input" name="private" id="makePrivate" aria-label="Make private" value="1" <%= attr.prv.join( " " ); %>>
-                  <label for="makePrivate" class="form-check-label badge badge-secondary text-white">private</label>
+                  <label for="makePrivate" class="form-check-label badge badge-info text-white">private</label>
                 </div>
               <% } -%>
             </div>
@@ -39,14 +40,16 @@
             </div>
             <div class="form-group">
               <label for="body">Body Text:</label>
-              <textarea rows="10" class="form-control" name="body" id="body" aria-describedby="bodyHelp" placeholder="Enter body text" oninput="this.preview.update()"><%= wiki.body %></textarea>
+              <textarea rows="8" class="form-control" name="body" id="body" aria-describedby="bodyHelp" placeholder="Enter body text" oninput="this.preview.update()"><%= wiki.body %></textarea>
               <small id="bodyHelp" class="form-text text-muted">Body text must be at least 4 characters in length.</small>
             </div>
-            <button type="submit" class="btn btn-primary">Update</button>
+            <div class="btn-group action-bar" role="group" aria-label="Actions">
+              <button type="submit" class="btn btn-primary">Update</button>
+            </div>
           </form>
         </div>
         <div class="col-md">
-          <p>Preview:</p>
+          <p class="mb-2">Preview:</p>
           <div class="markdown" id="preview"></div>
         </div>
       </div>

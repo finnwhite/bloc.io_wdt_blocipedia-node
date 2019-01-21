@@ -14,13 +14,13 @@ describe( "routes:wikis", () => {
     auth.signOut( done );
   } );
   beforeEach( ( done ) => {
-    this.user;
+    this.user = {};
     this.wiki = {};
     sequelize.sync( { force: true } ).then( () => {
 
       const values = {
-        username: "other",
-        email: "other@example.com",
+        username: "creator",
+        email: "creator@example.com",
         password: "1234567890",
         role: "premium",
       };
@@ -28,7 +28,6 @@ describe( "routes:wikis", () => {
       User.create( values )
       .then( ( user ) => {
         expect( user ).not.toBeNull();
-        this.user = user;
 
         const values = {
           title: "Putting A Toddler To Bed",
@@ -57,7 +56,7 @@ describe( "routes:wikis", () => {
         } );
       } );
     } )
-    .catch( ( err ) => { console.log( err ); done(); } );
+    .catch( ( err ) => { console.log( "ERROR: %O", err ); done(); } );
   } );
   afterEach( ( done ) => {
     auth.signOut( done );
@@ -80,6 +79,7 @@ describe( "routes:wikis", () => {
           expect( body ).toContain( "Blocipedia | Wikis" );
           expect( body ).toContain( wiki.public.title ); // "...To Bed"
           expect( body ).not.toContain( wiki.private.title ); // "...Diaper"
+          //console.log( "BODY:", body );
           done();
         } );
       } );
@@ -135,6 +135,7 @@ describe( "routes:wikis", () => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 200 );
           expect( body ).toContain( "Blocipedia | New Wiki" );
+          //console.log( "BODY:", body );
           done();
         } );
       } );
@@ -158,6 +159,7 @@ describe( "routes:wikis", () => {
         request.post( options, ( err, res, body ) => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 302 );
+          console.log( "BODY: %O", body );
 
           Wiki.findOne( { where: { title: form.title } } )
           .then( ( wiki ) => {
@@ -186,6 +188,7 @@ describe( "routes:wikis", () => {
         request.post( options, ( err, res, body ) => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 302 );
+          console.log( "BODY: %O", body );
 
           Wiki.findOne( { where: { title: form.title } } )
           .then( ( wiki ) => {
@@ -208,6 +211,7 @@ describe( "routes:wikis", () => {
         request.post( options, ( err, res, body ) => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 302 );
+          console.log( "BODY: %O", body );
 
           Wiki.findOne( { where: { title: form.title } } )
           .then( ( wiki ) => {
@@ -220,29 +224,6 @@ describe( "routes:wikis", () => {
     } );
     /* END: POST /wikis/create ----- */
 
-    describe( "GET /wikis/dashboard", () => {
-
-      it( "should render the current user's Wiki Dashboard page " +
-          "AND display only wikis created by the user", ( done ) => {
-
-        const url = `${ base }/dashboard`;
-
-        request.get( url, ( err, res, body ) => {
-          expect( err ).toBeNull();
-          expect( res.statusCode ).toBe( 200 );
-
-          const wiki = this.wiki;
-          expect( body ).toContain( "Blocipedia | Wiki Dashboard" );
-          expect( body ).toContain( "<h1>My Wikis</h1>" );
-          expect( body ).toContain( wiki.byUser.title ); // "...To Wear A Bib"
-          expect( body ).not.toContain( wiki.public.title ); // "...To Bed"
-          done();
-        } );
-      } );
-
-    } );
-    /* END: GET /wikis/dashboard ----- */
-
     describe( "GET /wikis/:id", () => {
 
       it( "should render the requested PUBLIC wiki", ( done ) => {
@@ -253,7 +234,8 @@ describe( "routes:wikis", () => {
         request.get( url, ( err, res, body ) => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 200 );
-          expect( body ).toContain( `Wikis | ${ wiki.title }` );
+          expect( body ).toContain( `${ wiki.title }</h1>` );
+          //console.log( "BODY:", body );
           done();
         } );
       } );
@@ -266,7 +248,8 @@ describe( "routes:wikis", () => {
         request.get( url, ( err, res, body ) => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 200 );
-          expect( body ).not.toContain( `Wikis | ${ wiki.title }` );
+          expect( body ).not.toContain( `${ wiki.title }</h1>` );
+          //console.log( "BODY:", body );
           done();
         } );
       } );
@@ -286,6 +269,7 @@ describe( "routes:wikis", () => {
           expect( res.statusCode ).toBe( 200 );
           expect( body ).toContain( "Blocipedia | Edit Wiki" );
           expect( body ).toContain( wiki.title );
+          //console.log( "BODY:", body );
           done();
         } );
       } );
@@ -299,6 +283,7 @@ describe( "routes:wikis", () => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 200 );
           expect( body ).not.toContain( "Blocipedia | Edit Wiki" );
+          //console.log( "BODY:", body );
           done();
         } );
       } );
@@ -323,6 +308,7 @@ describe( "routes:wikis", () => {
         request.post( options, ( err, res, body ) => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 302 );
+          console.log( "BODY: %O", body );
 
           this.wiki.public.reload()
           .then( ( wiki ) => {
@@ -357,6 +343,7 @@ describe( "routes:wikis", () => {
           request.get( url, ( err, res, body ) => {
             expect( err ).toBeNull();
             expect( res.statusCode ).toBe( 200 );
+            //console.log( "BODY:", body );
 
             Wiki.count()
             .then( ( countAfter ) => {
@@ -380,6 +367,7 @@ describe( "routes:wikis", () => {
           request.get( url, ( err, res, body ) => {
             expect( err ).toBeNull();
             expect( res.statusCode ).toBe( 200 );
+            //console.log( "BODY:", body );
 
             Wiki.count()
             .then( ( countAfter ) => {
@@ -461,6 +449,7 @@ describe( "routes:wikis", () => {
         request.post( options, ( err, res, body ) => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 302 );
+          console.log( "BODY: %O", body );
 
           Wiki.findOne( { where: { title: form.title } } )
           .then( ( wiki ) => {
@@ -490,7 +479,8 @@ describe( "routes:wikis", () => {
         request.get( url, ( err, res, body ) => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 200 );
-          expect( body ).toContain( `Wikis | ${ wiki.title }` );
+          expect( body ).toContain( `${ wiki.title }</h1>` );
+          //console.log( "BODY:", body );
           done();
         } );
       } );
@@ -505,7 +495,8 @@ describe( "routes:wikis", () => {
         request.get( url, ( err, res, body ) => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 200 );
-          expect( body ).not.toContain( `Wikis | ${ wiki.title }` );
+          expect( body ).not.toContain( `${ wiki.title }</h1>` );
+          //console.log( "BODY:", body );
           done();
         } );
       } );
@@ -527,6 +518,7 @@ describe( "routes:wikis", () => {
           expect( res.statusCode ).toBe( 200 );
           expect( body ).toContain( "Blocipedia | Edit Wiki" );
           expect( body ).toContain( wiki.title );
+          //console.log( "BODY:", body );
           done();
         } );
       } );
@@ -542,6 +534,7 @@ describe( "routes:wikis", () => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 200 );
           expect( body ).not.toContain( "Blocipedia | Edit Wiki" );
+          //console.log( "BODY:", body );
           done();
         } );
       } );
@@ -568,6 +561,7 @@ describe( "routes:wikis", () => {
         request.post( options, ( err, res, body ) => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 302 );
+          console.log( "BODY: %O", body );
 
           this.wiki.byUser.public.reload()
           .then( ( wiki ) => {

@@ -1,4 +1,4 @@
-<ul class="list-group list-group-flush">
+<ul class="list-group list-group-flush wiki-list">
   <% wikis.forEach( ( wiki ) => { -%>
     <li class="list-group-item px-0">
       <article>
@@ -11,8 +11,9 @@
         <footer>
           <p class="mb-0 text-muted text-truncate">
             <small>
-              <span class="badge badge-secondary"><%= wiki.getPrivacy() %></span>
-              Last update: <%= wiki.updatedAt.toLocaleString() %>
+              <% const subclass = wiki.private ? "info" : "secondary"; -%>
+              <span class="badge badge-<%= subclass %>"><%= wiki.getPrivacy() %></span>
+              - Updated: <%= wiki.updatedAt.toLocaleString() %>
             </small>
           </p>
         </footer>

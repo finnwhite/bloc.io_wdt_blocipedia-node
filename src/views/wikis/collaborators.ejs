@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include( "../includes/head-start.ejs",
+      { docTitle: "Blocipedia | Wiki Collaborators" }
+    ); -%>
+  </head>
+  <body>
+    <%- include( "../includes/navbar.ejs" ); -%>
+    <main class="container px-0 py-3">
+      <%- include( "../includes/messages.ejs" ); -%>
+      <% if ( showInvite ) { -%>
+        <div class="btn-group btn-group-sm action-bar" role="group" aria-label="Action Bar">
+          <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#inviteModal">Invite Collaborator</button>
+        </div>
+      <% } -%>
+
+      <h1>Wiki Collaborators</h1>
+
+      <p class="h5 text-truncate"><%= wiki.title %></p>
+      <p class="text-truncate"><%= wiki.getBodyPreview() %></p>
+
+      <table class="table table-striped wiki-collaboration">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">User</th>
+            <th scope="col">Role</th>
+            <th scope="col">Permissions</th>
+            <th scope="col">Added</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% let rowNum = 1; -%>
+          <tr class="table-info wiki-creator">
+            <th scope="row"><%= rowNum++ %></th>
+            <td><%= wiki.creator.username %> <small class="text-muted"><%= wiki.creator.email %></small></td>
+            <td>Creator</td>
+            <td>View, Edit, Invite, Remove</td>
+            <td><small><%= wiki.createdAt.toLocaleString() %></small></td>
+            <td></td>
+          <tr class="wiki-collaborator">
+          <% wiki.collaboration.forEach( ( collab ) => {
+            const user = collab.collaborator; -%>
+            <tr>
+              <th scope="row"><%= rowNum++ %></th>
+              <td><%= user.username %> <small class="text-muted"><%= user.email %></small></td>
+              <td>Collaborator</td>
+              <td>View, Edit</td>
+              <td><small><%= collab.createdAt.toLocaleString() %></small></td>
+              <td>
+                <% if ( showRemove ) { -%>
+                  <a href="/wikis/<%= wiki.id %>/collaborators/<%= user.id %>/delete" class="btn btn-sm btn-secondary">Remove</a>
+                <% } -%>
+              </td>
+            </tr>
+          <% } ); -%>
+        </tbody>
+      </table>
+
+    </main>
+
+    <% if ( showInvite ) { -%>
+      <div class="modal fade" id="inviteModal" tabindex="-1" role="dialog" aria-labelledby="inviteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="inviteModalLabel">Invite Collaborator</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form method="POST" action="/wikis/<%= wiki.id %>/collaborators/create" id="inviteForm">
+                <div class="form-group">
+                  <label for="email">Email:</label>
+                  <input type="email" class="form-control" name="email" id="email" aria-describedby="emailHelp" placeholder="Enter email">
+                  <small id="emailHelp" class="form-text text-muted">Email must be a valid email address.</small>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary" form="inviteForm">Invite</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% } -%>
+    <%- include( "../includes/body-end.ejs" ); -%>
+  </body>
+</html>

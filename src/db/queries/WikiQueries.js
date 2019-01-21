@@ -9,7 +9,7 @@ class WikiQueries extends ModelQueries {
   makePublic( id, callback ) {
 
     const scope = { method: [ "byCreatorId", id ] };
-    const records = this.model.scope( scope );
+    const records = this.model.scope( "private", scope );
     const updates = { private: false };
 
     return (

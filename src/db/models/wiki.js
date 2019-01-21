@@ -22,7 +22,14 @@ module.exports = ( sequelize, DataTypes ) => {
       allowNull: false,
       defaultValue: false,
     },
+    creatorId: {
+      type: DataTypes.INTEGER,
+      references: { model: "Users", key: "id" },
+      onDelete: "CASCADE",
+    },
   }, {
+    /* defaultScope defined in Wiki.associate */
+
     scopes: {
       public: {
         where: { private: false },
@@ -44,6 +51,36 @@ module.exports = ( sequelize, DataTypes ) => {
   Wiki.associate = function( models ) {
 
     Wiki.belongsTo( models.User, { as: "creator" } );
+
+    Wiki.hasMany( models.Collaborator, {
+      as: "collaboration",
+      scope: { contentType: "wiki" },
+      foreignKey: "contentId",
+    } );
+
+    Wiki.belongsToMany( models.User, {
+      as: "collaborators",
+      through: {
+        model: models.Collaborator,
+        scope: { contentType: "wiki" },
+        unique: false,
+      },
+      foreignKey: "contentId",
+      constraints: false,
+    } );
+
+    Wiki.addScope( "defaultScope",  {
+      include: [ {
+        association: "creator",
+      }, {
+        association: "collaboration",
+        include: [ {
+          association: "collaborator"
+        } ],
+        order: [ [ models.Collaborator, "createdAt", "ASC" ] ],
+      } ],
+      order: [ [ "updatedAt", "DESC" ] ],
+    }, { override: true } );
 
   };
 

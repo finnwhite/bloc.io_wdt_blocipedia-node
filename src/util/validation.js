@@ -51,6 +51,12 @@ module.exports = {
     .withMessage( "must be at least 4 characters in length" ),
   ],
 
+  createCollaborator: [
+    check( "email" )
+    .isEmail()
+    .withMessage( "must be a valid email address" ),
+  ],
+
   updatePlan: [
     check( "plan" )
     .isIn( [ "standard", "premium" ] )

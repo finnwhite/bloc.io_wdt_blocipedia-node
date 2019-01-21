@@ -4,6 +4,10 @@ class ModelQueries {
     this.model = model;
   }
 
+  scope( scope = null ) {
+    return new this.constructor( this.model.scope( scope ) );
+  }
+
   selectAll( callback ) {
     return (
       this.model.findAll()
@@ -11,10 +15,9 @@ class ModelQueries {
       .catch( ( err ) => { this.handleError( err, callback ) } )
     )
   }
-
-  selectAllScoped( scope = null, callback ) {
+  selectAllWhere( where, callback ) {
     return (
-      this.model.scope( scope ).findAll()
+      this.model.findAll( { where } )
       .then( ( records ) => { callback( null, records ); } )
       .catch( ( err ) => { this.handleError( err, callback ) } )
     )
@@ -23,6 +26,13 @@ class ModelQueries {
   select( id, callback ) {
     return (
       this.model.findByPk( id )
+      .then( ( record ) => { callback( null, record ); } )
+      .catch( ( err ) => { this.handleError( err, callback ) } )
+    )
+  }
+  selectWhere( where, callback ) {
+    return (
+      this.model.findOne( { where } )
       .then( ( record ) => { callback( null, record ); } )
       .catch( ( err ) => { this.handleError( err, callback ) } )
     )
@@ -56,13 +66,30 @@ class ModelQueries {
       .catch( ( err ) => { this.handleError( err, callback ) } )
     )
   }
+  deleteWhere( where, callback ) {
+    return (
+      this.model.destroy( { where } )
+      .then( ( destroyedCount ) => { callback( null, destroyedCount ); } )
+      .catch( ( err ) => { this.handleError( err, callback ) } )
+    )
+  }
 
   handleError( err, callback ) {
-    console.log( "QUERY ERROR: %O", err );
+    //console.log( "QUERY ERROR: %O", err );
+
     /* format error messages */
+    const es = err.toString();
+    const em = err.message;
     const db = err.original.detail; // database error message
     const sq = err.errors[ 0 ].message; // Sequelize error message
     const msg = `${ db } ${ sq }`;
+
+    console.log( "err.toString(): %O", es );
+    console.log( "err.message: %O", em );
+    console.log( "err.db: %O", db );
+    console.log( "err.sq: %O", sq );
+    console.log( "msg: %O", msg );
+
     return callback( msg );
   }
 

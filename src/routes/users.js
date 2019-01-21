@@ -42,4 +42,9 @@ router.post( `${ base }/downgrade-plan`,
   controller.downgradePlan
 );
 
+router.get( `${ base }/dashboard`,
+  auth.ensureUser,
+  controller.dashboard
+);
+
 module.exports = router;

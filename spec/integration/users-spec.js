@@ -5,6 +5,7 @@ const base = "http://localhost:3000/users";
 const sequelize = require( "../../src/db/models" ).sequelize;
 const User = require( "../../src/db/models" ).User;
 const Wiki = require( "../../src/db/models" ).Wiki;
+const Collaborator = require( "../../src/db/models" ).Collaborator;
 const auth = require( "../support/mock-auth.js" );
 
 
@@ -14,10 +15,11 @@ describe( "routes:users", () => {
     auth.signOut( done );
   } );
   beforeEach( ( done ) => {
-    this.user;
+    this.user = {};
     this.wiki = {};
+    this.collab = {};
     sequelize.sync( { force: true } ).then( () => { done(); } )
-    .catch( ( err ) => { console.log( err ); done(); } );
+    .catch( ( err ) => { console.log( "ERROR: %O", err ); done(); } );
   } );
   afterEach( ( done ) => {
     auth.signOut( done );
@@ -35,6 +37,7 @@ describe( "routes:users", () => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 200 );
           expect( body ).toContain( "Blocipedia | Sign Up" );
+          //console.log( "BODY:", body );
           done();
         } );
       } );
@@ -44,7 +47,8 @@ describe( "routes:users", () => {
 
     describe( "POST /users/create", () => {
 
-      it( "should create new User when supplied valid values", ( done ) => {
+      it( "should create a new User " +
+          "when supplied valid values", ( done ) => {
 
         const url = `${ base }/create`;
         const form = {
@@ -58,6 +62,7 @@ describe( "routes:users", () => {
         request.post( options, ( err, res, body ) => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 302 );
+          console.log( "BODY: %O", body );
 
           User.findOne( { where: { username: form.username } } )
           .then( ( user ) => {
@@ -74,7 +79,8 @@ describe( "routes:users", () => {
         } );
       } );
 
-      it( "should NOT create new User when supplied INVALID values", ( done ) => {
+      it( "should NOT create a new User " +
+          "when supplied INVALID values", ( done ) => {
 
         const url = `${ base }/create`;
         const form = {
@@ -87,6 +93,7 @@ describe( "routes:users", () => {
         request.post( options, ( err, res, body ) => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 302 );
+          console.log( "BODY: %O", body );
 
           User.findOne( { where: { username: form.username } } )
           .then( ( user ) => {
@@ -96,8 +103,67 @@ describe( "routes:users", () => {
         } );
       } );
 
+      it( "should NOT create a new User " +
+          "when username or email already in use", ( done ) => {
+
+        const values = {
+          username: "popular",
+          email: "popular@example.com",
+          password: "original",
+        };
+
+        User.create( values )
+        .then( ( user ) => {
+          expect( user ).not.toBeNull();
+
+          User.count( { where: { username: "popular" } } )
+          .then( ( countBefore ) => {
+            expect( countBefore ).toBe( 1 );
+
+            const url = `${ base }/create`;
+            const form = {
+              username: "popular",
+              email: "popular@example.com",
+              password: "copycat",
+              confirmation: "copycat",
+            };
+            const options = { url, form };
+
+            request.post( options, ( err, res, body ) => {
+              expect( err ).toBeNull();
+              expect( res.statusCode ).toBe( 302 );
+              console.log( "BODY: %O", body );
+
+              User.count( { where: { username: "popular" } } )
+              .then( ( countAfter ) => {
+                expect( countAfter ).toBe( countBefore ); // unchanged
+                done();
+              } );
+            } );
+          } );
+        } );
+      } );
+
     } );
     /* END: POST /users/create ----- */
+
+    describe( "GET /users/sign-in", () => {
+
+      it( "should render the Sign In page", ( done ) => {
+
+        const url = `${ base }/sign-in`;
+
+        request.get( url, ( err, res, body ) => {
+          expect( err ).toBeNull();
+          expect( res.statusCode ).toBe( 200 );
+          expect( body ).toContain( "Blocipedia | Sign In" );
+          //console.log( "BODY:", body );
+          done();
+        } );
+      } );
+
+    } );
+    /* END: GET /users/sign-in ----- */
 
   } );
   /* END: routes:users:guest ----- */
@@ -125,26 +191,9 @@ describe( "routes:users", () => {
       } );
     } );
 
-    describe( "GET /users/sign-in", () => {
-
-      it( "should render the Sign In page", ( done ) => {
-
-        const url = `${ base }/sign-in`;
-
-        request.get( url, ( err, res, body ) => {
-          expect( err ).toBeNull();
-          expect( res.statusCode ).toBe( 200 );
-          expect( body ).toContain( "Blocipedia | Sign In" );
-          done();
-        } );
-      } );
-
-    } );
-    /* END: GET /users/sign-in ----- */
-
     describe( "GET /users/account", () => {
 
-      it( "should render the Account page with the current user's " +
+      it( "should render the Account page displaying the current user's " +
           "username, email, and membership plan", ( done ) => {
 
         const url = `${ base }/account`;
@@ -156,6 +205,7 @@ describe( "routes:users", () => {
           expect( body ).toContain( this.user.username ); // "std-user"
           expect( body ).toContain( this.user.email ); // "std@example.com"
           expect( body ).toContain( this.user.role ); // "standard"
+          //console.log( "BODY:", body );
           done();
         } );
       } );
@@ -165,8 +215,7 @@ describe( "routes:users", () => {
 
     describe( "POST /users/upgrade-plan", () => {
 
-      it( "should upgrade current user to premium plan " +
-          "when supplied valid values", ( done ) => {
+      it( "should upgrade current user to premium plan", ( done ) => {
 
         const url = `${ base }/upgrade-plan`;
         const form = {
@@ -179,6 +228,7 @@ describe( "routes:users", () => {
         request.post( options, ( err, res, body ) => {
           expect( err ).toBeNull();
           expect( res.statusCode ).toBe( 302 );
+          console.log( "BODY: %O", body );
 
           this.user.reload()
           .then( ( user ) => {
@@ -191,6 +241,85 @@ describe( "routes:users", () => {
 
     } );
     /* END: POST /users/upgrade-plan ----- */
+
+    describe( "GET /users/dashboard", () => {
+
+      beforeEach( ( done ) => {
+
+        const values = {
+          title: "Getting A Toddler To Wear A Bib",
+          body: "So much yogurt. So much laundry.",
+          creatorId: this.user.id,
+        };
+
+        Wiki.create( values )
+        .then( ( wiki ) => {
+          expect( wiki ).not.toBeNull();
+          this.wiki.myWiki = wiki;
+
+          const values = {
+            username: "creator",
+            email: "creator@example.com",
+            password: "1234567890",
+            role: "premium",
+          };
+
+          User.create( values )
+          .then( ( user ) => {
+            expect( user ).not.toBeNull();
+
+            const values = {
+              title: "Changing A Dirty Diaper",
+              body: "What is THAT? Photos plus detailed descriptions.",
+              private: true,
+              creatorId: user.id,
+            };
+
+            Wiki.create( values )
+            .then( ( wiki ) => {
+              expect( wiki ).not.toBeNull();
+              this.wiki.myCollab = wiki;
+
+              const values = {
+                contentType: "wiki",
+                contentId: wiki.id, // "Changing A Dirty Diaper"
+                userId: this.user.id, // "std-user"
+              };
+
+              Collaborator.create( values )
+              .then( ( collab ) => {
+                expect( collab ).not.toBeNull();
+                this.collab = collab;
+                done();
+              } );
+            } );
+          } );
+        } );
+      } );
+
+      it( "should render the current user's Dashboard page " +
+          "AND display wikis created by the user " +
+          "AND the user's wiki collaborations", ( done ) => {
+
+        const url = `${ base }/dashboard`;
+
+        request.get( url, ( err, res, body ) => {
+          expect( err ).toBeNull();
+          expect( res.statusCode ).toBe( 200 );
+
+          const wiki = this.wiki;
+          expect( body ).toContain( "Blocipedia | Dashboard" );
+          expect( body ).toContain( "My Wikis</h1>" );
+          expect( body ).toContain( wiki.myWiki.title ); // "...To Wear A Bib"
+          expect( body ).toContain( "My Collaborations</h1>" );
+          expect( body ).toContain( wiki.myCollab.title ); // "...Dirty Diaper"
+          //console.log( "BODY:", body );
+          done();
+        } );
+      } );
+
+    } );
+    /* END: GET /wikis/dashboard ----- */
 
   } );
   /* END: routes:users:standard ----- */
@@ -249,10 +378,10 @@ describe( "routes:users", () => {
       it( "should downgrade current user to standard plan " +
           "AND make PUBLIC all PRIVATE wikis created by user", ( done ) => {
 
-        const scope = [
+        const wikis = Wiki.scope( [
           "private", { method: [ "byCreatorId", this.user.id ] }
-        ];
-        const wikis = Wiki.scope( scope );
+        ] );
+
         wikis.count()
         .then( ( countBefore ) => {
           expect( countBefore ).toBeGreaterThan( 0 );
@@ -264,6 +393,7 @@ describe( "routes:users", () => {
           request.post( options, ( err, res, body ) => {
             expect( err ).toBeNull();
             expect( res.statusCode ).toBe( 302 );
+            console.log( "BODY: %O", body );
 
             this.user.reload()
             .then( ( user ) => {

@@ -2,33 +2,42 @@
 <html lang="en">
   <head>
     <%- include( "../includes/head-start.ejs",
-      { docTitle: `Blocipedia | Wikis | ${ wiki.title }` }
+      { docTitle: "Blocipedia | View Wiki" }
     ); -%>
   </head>
   <body>
     <%- include( "../includes/navbar.ejs" ); -%>
-    <main class="container">
+    <main class="container px-0 py-3">
       <%- include( "../includes/messages.ejs" ); -%>
-
-      <h1><%= wiki.title %></h1>
-
-      <% if ( showEdit || showDelete ) { -%>
-        <div class="btn-group" role="group" aria-label="Actions">
+      <% if ( showActions ) { -%>
+        <div class="btn-group btn-group-sm action-bar" role="group" aria-label="Action Bar">
+          <% if ( showCollaborators ) { -%>
+            <a href="/wikis/<%= wiki.id %>/collaborators" class="btn btn-outline-secondary">Collaborators</a>
+          <% } -%>
           <% if ( showEdit ) { -%>
-            <a href="/wikis/<%= wiki.id %>/edit" class="btn btn-outline-primary">Edit</a>
+            <a href="/wikis/<%= wiki.id %>/edit" class="btn btn btn-outline-secondary">Edit</a>
           <% } -%>
           <% if ( showDelete ) { -%>
-            <a href="/wikis/<%= wiki.id %>/delete" class="btn btn-outline-primary">Delete</a>
+            <a href="/wikis/<%= wiki.id %>/delete" class="btn btn btn-outline-secondary">Delete</a>
           <% } -%>
         </div>
       <% } -%>
 
+      <h1><%= wiki.title %></h1>
+
       <div class="markdown"><%- wiki.getBodyHtml() -%></div>
 
-      <footer>
+      <footer class="pt-2">
         <p class="text-muted">
-          <span class="badge badge-secondary"><%= wiki.getPrivacy() %></span>
-          Last update: <%= wiki.updatedAt.toLocaleString() %>
+          <% const subclass = wiki.private ? "info" : "secondary"; -%>
+          <span class="badge badge-<%= subclass %>"><%= wiki.getPrivacy() %></span>
+          <% if ( wiki.private && wiki.collaboration ) {
+              const count = wiki.collaboration.length;
+              const plural = ( count === 1 ) ? "" : "s"; -%>
+              - <%= count %> collaborator<%= plural %>
+          <% } -%>
+          - Created: <%= wiki.createdAt.toLocaleString() %>
+          - Updated: <%= wiki.updatedAt.toLocaleString() %>
         </p>
       </footer>
 

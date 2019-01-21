@@ -20,11 +20,6 @@ router.post( `${ base }/create`,
   controller.create
 );
 
-router.get( `${ base }/dashboard`,
-  auth.ensureUser,
-  controller.dashboard
-);
-
 router.get( `${ base }/:id`,
   controller.view
 );
@@ -42,6 +37,21 @@ router.post( `${ base }/:id/update`,
 router.get( `${ base }/:id/delete`,
   auth.ensureUser,
   controller.delete
+);
+
+router.get( `${ base }/:wikiId/collaborators`,
+  auth.ensureUser,
+  controller.collaborators
+);
+router.post( `${ base }/:wikiId/collaborators/create`,
+  auth.ensureUser,
+  validation.createCollaborator, validation.result,
+  controller.createCollaborator
+);
+
+router.get( `${ base }/:wikiId/collaborators/:userId/delete`,
+  auth.ensureUser,
+  controller.deleteCollaborator
 );
 
 module.exports = router;

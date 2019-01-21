@@ -1,5 +1,6 @@
 const User = require( "../db/models" ).User;
 const Wiki = require( "../db/models" ).Wiki;
+const WikiPolicy = require( "../policies/WikiPolicy.js" );
 const auth = require( "../util/authentication.js" );
 const email = require( "../util/email.js" );
 const payments = require( "../util/payments.js" );
@@ -115,6 +116,33 @@ module.exports = {
           }
           res.redirect( "/users/account" );
         } );
+      }
+    } );
+  },
+
+  dashboard( req, res, next ) {
+    User.queries.dashboard( req.user.id, ( err, user ) => {
+      if ( err ) {
+        req.flash( "style", "danger" );
+        req.flash( "alert", err );
+        res.redirect( ( req.headers.referer || "/" ) );
+      }
+      else {
+
+        /* force sort wikis in order by latest update, TODO: via query */
+        const updatedAtDesc = function( a, b ) {
+          const aValue = a.updatedAt;
+          const bValue = b.updatedAt;
+          if ( aValue < bValue ) { return 1; }
+          if ( aValue > bValue ) { return -1; }
+          return 0;
+        }
+        user.wikiCreations.sort( updatedAtDesc );
+        user.wikiCollaborations.sort( updatedAtDesc );
+
+        const showNew = new WikiPolicy( req.user ).new();
+        const showActions = showNew;
+        res.render( "users/dashboard", { user, showActions, showNew } );
       }
     } );
   },

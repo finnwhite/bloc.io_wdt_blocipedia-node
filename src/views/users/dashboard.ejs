@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include( "../includes/head-start.ejs",
+      { docTitle: "Blocipedia | Dashboard" }
+    ); -%>
+  </head>
+  <body>
+    <%- include( "../includes/navbar.ejs" ); -%>
+    <main class="container px-0 py-3">
+      <%- include( "../includes/messages.ejs" ); -%>
+      <% if ( showActions ) { -%>
+        <div class="btn-group btn-group-sm action-bar" role="group" aria-label="Action Bar">
+          <% if ( showNew ) { -%>
+            <a href="/wikis/new" class="btn btn-outline-secondary">New Wiki</a>
+          <% } -%>
+        </div>
+      <% } -%>
+
+      <div class="row dashboard">
+        <div class="col-md">
+          <section>
+
+            <h1 class="h2">My Wikis</h1>
+
+            <%- include( "../wikis/includes/list.ejs",
+              { wikis: user.wikiCreations }
+            ); -%>
+          </section>
+        </div>
+        <div class="col-md">
+          <section>
+
+            <h1 class="h2">My Collaborations</h1>
+
+            <%- include( "../wikis/includes/list.ejs",
+              { wikis: user.wikiCollaborations }
+            ); -%>
+          </section>
+        </div>
+      </div>
+
+    </main>
+    <%- include( "../includes/body-end.ejs" ); -%>
+  </body>
+</html>

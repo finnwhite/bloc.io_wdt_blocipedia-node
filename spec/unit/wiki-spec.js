@@ -6,7 +6,7 @@ const Wiki = require( "../../src/db/models" ).Wiki;
 describe( "Wiki", () => {
 
   beforeEach( ( done ) => {
-    this.user;
+    this.user = {};
     sequelize.sync( { force: true } ).then( () => {
 
       const values = {
@@ -23,12 +23,13 @@ describe( "Wiki", () => {
         done();
       } );
     } )
-    .catch( ( err ) => { console.log( err ); done(); } );
+    .catch( ( err ) => { console.log( "ERROR: %O", err ); done(); } );
   } );
 
   describe( ".create()", () => {
 
-    it( "should create new Wiki when supplied valid values", ( done ) => {
+    it( "should create new Wiki " +
+        "when supplied valid values", ( done ) => {
 
       const values = {
         title: "Toddler Tunes",
@@ -45,12 +46,13 @@ describe( "Wiki", () => {
         done();
       } )
       .catch( ( err ) => {
-        console.log( err );
+        console.log( "ERROR: %O", err );
         done();
       } );
     } );
 
-    it( "should NOT create new Wiki when supplied INVALID values", ( done ) => {
+    it( "should NOT create new Wiki " +
+        "when supplied INVALID values", ( done ) => {
 
       const values = {
         title: "Z",
@@ -59,9 +61,11 @@ describe( "Wiki", () => {
 
       Wiki.create( values )
       .then( ( wiki ) => { // should never succeed, execute
+        expect( wiki ).toBeNull();
         done();
       } )
       .catch( ( err ) => {
+        //console.log( "ERROR: %O", err );
         expect( err.message ).toContain( "Validation error" );
         expect( err.message ).toContain( "title" ); // len < 2
         expect( err.message ).toContain( "body" ); // len < 4

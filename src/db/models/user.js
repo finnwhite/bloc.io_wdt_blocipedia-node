@@ -26,13 +26,41 @@ module.exports = ( sequelize, DataTypes ) => {
     role: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: { isIn: [ [ "standard", "premium", "admin" ] ] },
       defaultValue: "standard",
     },
-  }, {} );
+  }, {
+    defaultScope: {
+      order: [ [ "createdAt", "ASC" ] ],
+    },
+  } );
 
   User.associate = function( models ) {
 
-    User.hasMany( models.Wiki, { foreignKey: "creatorId" } );
+    User.hasMany( models.Wiki, {
+      as: "wikiCreations",
+      foreignKey: "creatorId",
+    } );
+
+    User.hasMany( models.Collaborator, {
+      as: "collaborations",
+      foreignKey: "userId",
+    } );
+
+    User.belongsToMany( models.Wiki, {
+      as: "wikiCollaborations",
+      through: {
+        model: models.Collaborator,
+        scope: { contentType: "wiki" },
+        unique: false,
+      },
+      foreignKey: "userId",
+      constraints: false,
+    } );
+
+    User.addScope( "dashboard",  {
+      include: [ "wikiCreations", "wikiCollaborations" ],
+    } );
 
   };
 

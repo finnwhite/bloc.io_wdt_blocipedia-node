@@ -1,3 +1,18 @@
+main.py-3 > .alert:first-child {
+  margin-top: -1rem;
+}
+
+.action-bar {
+  margin-bottom: 1rem;
+}
+main > .action-bar:first-child {
+  margin-top: -.5rem;
+}
+
+.dashboard .text-truncate {
+  white-space: normal; /* disable truncate */
+}
+
 .markdown blockquote {
   padding-left: 1rem;
   border-left: 2px solid #6C757D;
